@@ -1,0 +1,915 @@
+{
+	"info": {
+		"_postman_id": "booking-management-service-001",
+		"name": "Booking Management Service - Local Dev",
+		"description": "Complete API collection for Booking Management Service (Spring Boot 3.x)\n\n**Environment:** Local Development\n**Base URL:** http://localhost:8080\n**Authentication:** JWT Bearer Token (stub format: Bearer user-{userId})\n\n**Profile:** Dev (H2 in-memory database)\n\n**Endpoints:**\n- Health/Actuator: Public endpoints\n- Bookings: Protected endpoints requiring authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health / Actuator",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Public health check endpoint. No authentication required."
+					},
+					"response": [
+						{
+							"name": "Success - Health UP",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/actuator/health",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"actuator",
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"status\": \"UP\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Public health and monitoring endpoints"
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hotelId\": \"hotel-123\",\n    \"roomTypeId\": \"room-type-456\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-30\",\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1-555-123-4567\",\n    \"specialRequests\": \"Late check-in requested\",\n    \"supplierCode\": \"HOTELBEDS\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							]
+						},
+						"description": "Create a new booking.\n\n**Required fields:**\n- hotelId: Hotel identifier\n- roomTypeId: Room type identifier\n- checkIn: Check-in date (ISO format: YYYY-MM-DD)\n- checkOut: Check-out date (ISO format: YYYY-MM-DD)\n- guestName: Guest full name\n- guestEmail: Valid email address\n- guestPhone: Guest phone number\n\n**Optional fields:**\n- specialRequests: Special requests or notes\n- offerPayloadJson: JSON string with offer details\n- supplierCode: Supplier code (HOTELBEDS or TRAVELLANDA) - if not provided, booking uses OWNER path\n\n**Authentication:** Required (Bearer token)\n**User ID:** Extracted from token (format: user-{userId})"
+					},
+					"response": [
+						{
+							"name": "Success - Booking Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"hotelId\": \"hotel-123\",\n    \"roomTypeId\": \"room-type-456\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-30\",\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1-555-123-4567\",\n    \"specialRequests\": \"Late check-in requested\",\n    \"supplierCode\": \"HOTELBEDS\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"DRAFT\"\n}"
+						},
+						{
+							"name": "Error - Validation Failed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"hotelId\": \"\",\n    \"roomTypeId\": \"room-type-456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"timestamp\": \"2024-12-20T10:30:00Z\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"Hotel ID is required, Guest name is required\",\n    \"path\": \"/v1/bookings\"\n}"
+						},
+						{
+							"name": "Error - Unauthorized",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"hotelId\": \"hotel-123\",\n    \"roomTypeId\": \"room-type-456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Create Booking (Owner Path)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hotelId\": \"hotel-789\",\n    \"roomTypeId\": \"room-type-101\",\n    \"checkIn\": \"2024-12-20\",\n    \"checkOut\": \"2024-12-23\",\n    \"guestName\": \"Jane Smith\",\n    \"guestEmail\": \"jane.smith@example.com\",\n    \"guestPhone\": \"+1-555-987-6543\",\n    \"specialRequests\": \"Ground floor room preferred\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							]
+						},
+						"description": "Create a booking using OWNER inventory path (no supplierCode provided)."
+					},
+					"response": [
+						{
+							"name": "Success - Owner Booking Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"hotelId\": \"hotel-789\",\n    \"roomTypeId\": \"room-type-101\",\n    \"checkIn\": \"2024-12-20\",\n    \"checkOut\": \"2024-12-23\",\n    \"guestName\": \"Jane Smith\",\n    \"guestEmail\": \"jane.smith@example.com\",\n    \"guestPhone\": \"+1-555-987-6543\",\n    \"specialRequests\": \"Ground floor room preferred\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"660e8400-e29b-41d4-a716-446655440001\",\n    \"status\": \"DRAFT\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Booking By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"{{bookingId}}"
+							],
+							"variable": [
+								{
+									"key": "bookingId",
+									"value": "550e8400-e29b-41d4-a716-446655440000",
+									"description": "UUID of the booking"
+								}
+							]
+						},
+						"description": "Retrieve a booking by its ID.\n\n**Authentication:** Required (Bearer token)\n**Ownership:** User can only access their own bookings (userId from token must match booking.userId)"
+					},
+					"response": [
+						{
+							"name": "Success - Booking Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"DRAFT\",\n    \"source\": \"SUPPLIER\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-30\",\n    \"roomTypeId\": \"room-type-456\",\n    \"confirmationRef\": null\n}"
+						},
+						{
+							"name": "Error - Booking Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/00000000-0000-0000-0000-000000000000",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"00000000-0000-0000-0000-000000000000"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"timestamp\": \"2024-12-20T10:35:00Z\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"message\": \"Booking not found: 00000000-0000-0000-0000-000000000000\",\n    \"path\": \"/v1/bookings/00000000-0000-0000-0000-000000000000\"\n}"
+						},
+						{
+							"name": "Error - Unauthorized",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Confirm Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}/confirm",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"{{bookingId}}",
+								"confirm"
+							],
+							"variable": [
+								{
+									"key": "bookingId",
+									"value": "550e8400-e29b-41d4-a716-446655440000",
+									"description": "UUID of the booking to confirm"
+								}
+							]
+						},
+						"description": "Confirm a booking. This triggers the booking confirmation flow:\n\n1. **State Transition:** DRAFT → RECHECKING → PENDING_CONFIRMATION → CONFIRMED\n2. **Path Selection:**\n   - If booking has supplierCode → Uses SUPPLIER path (calls supplier adapter)\n   - Otherwise → Uses OWNER path (calls owner inventory adapter)\n3. **Recheck:** Validates availability and pricing\n4. **Confirmation:** Creates booking with supplier or reserves owner inventory\n\n**Idempotent:** If booking is already CONFIRMED, returns current state.\n\n**Authentication:** Required (Bearer token)\n**Ownership:** User can only confirm their own bookings"
+					},
+					"response": [
+						{
+							"name": "Success - Booking Confirmed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/confirm",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"confirm"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"CONFIRMED\",\n    \"confirmationRef\": \"SUP-770e8400-e29b-41d4-a716-446655440001\",\n    \"failureReason\": null\n}"
+						},
+						{
+							"name": "Success - Already Confirmed (Idempotent)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/confirm",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"confirm"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"CONFIRMED\",\n    \"confirmationRef\": \"SUP-770e8400-e29b-41d4-a716-446655440001\",\n    \"failureReason\": null\n}"
+						},
+						{
+							"name": "Error - Booking Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/00000000-0000-0000-0000-000000000000/confirm",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"00000000-0000-0000-0000-000000000000",
+										"confirm"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"timestamp\": \"2024-12-20T10:40:00Z\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"message\": \"Booking not found: 00000000-0000-0000-0000-000000000000\",\n    \"path\": \"/v1/bookings/00000000-0000-0000-0000-000000000000/confirm\"\n}"
+						},
+						{
+							"name": "Error - Recheck Failed (Sold Out)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/confirm",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"confirm"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"timestamp\": \"2024-12-20T10:45:00Z\",\n    \"status\": 409,\n    \"error\": \"Conflict\",\n    \"message\": \"Booking recheck failed: Room no longer available\",\n    \"path\": \"/v1/bookings/550e8400-e29b-41d4-a716-446655440000/confirm\"\n}"
+						},
+						{
+							"name": "Error - Invalid State Transition",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/confirm",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"confirm"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"timestamp\": \"2024-12-20T10:50:00Z\",\n    \"status\": 409,\n    \"error\": \"Conflict\",\n    \"message\": \"Invalid state transition: CANCELLED → CONFIRMED\",\n    \"path\": \"/v1/bookings/550e8400-e29b-41d4-a716-446655440000/confirm\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"{{bookingId}}",
+								"cancel"
+							],
+							"variable": [
+								{
+									"key": "bookingId",
+									"value": "550e8400-e29b-41d4-a716-446655440000",
+									"description": "UUID of the booking to cancel"
+								}
+							]
+						},
+						"description": "Cancel a confirmed booking.\n\n**Rules:**\n- Only CONFIRMED bookings can be cancelled\n- **Idempotent:** If booking is already CANCELLED, returns current state\n- Cancels with supplier or releases owner inventory\n\n**State Transition:** CONFIRMED → CANCELLED\n\n**Authentication:** Required (Bearer token)\n**Ownership:** User can only cancel their own bookings"
+					},
+					"response": [
+						{
+							"name": "Success - Booking Cancelled",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/cancel",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"cancel"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"CANCELLED\",\n    \"message\": \"Booking cancelled\"\n}"
+						},
+						{
+							"name": "Success - Already Cancelled (Idempotent)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/cancel",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"cancel"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"CANCELLED\",\n    \"message\": \"Booking cancelled\"\n}"
+						},
+						{
+							"name": "Error - Booking Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/00000000-0000-0000-0000-000000000000/cancel",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"00000000-0000-0000-0000-000000000000",
+										"cancel"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"timestamp\": \"2024-12-20T10:55:00Z\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"message\": \"Booking not found: 00000000-0000-0000-0000-000000000000\",\n    \"path\": \"/v1/bookings/00000000-0000-0000-0000-000000000000/cancel\"\n}"
+						},
+						{
+							"name": "Error - Only Confirmed Bookings Can Be Cancelled",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/cancel",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"cancel"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"timestamp\": \"2024-12-20T11:00:00Z\",\n    \"status\": 409,\n    \"error\": \"Conflict\",\n    \"message\": \"Only CONFIRMED bookings can be cancelled. Current status: DRAFT\",\n    \"path\": \"/v1/bookings/550e8400-e29b-41d4-a716-446655440000/cancel\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Booking management endpoints. All endpoints require authentication (Bearer token)."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "user-testuser",
+			"type": "string",
+			"description": "JWT token stub format: user-{userId}. Example: user-testuser extracts userId='testuser'"
+		},
+		{
+			"key": "bookingId",
+			"value": "550e8400-e29b-41d4-a716-446655440000",
+			"type": "string",
+			"description": "Example booking UUID. Replace with actual booking ID from create response."
+		}
+	]
+}
+

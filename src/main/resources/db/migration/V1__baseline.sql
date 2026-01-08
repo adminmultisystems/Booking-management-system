@@ -1,0 +1,27 @@
+-- ============================================================================
+-- FLYWAY BASELINE MIGRATION
+-- ============================================================================
+-- 
+-- IMPORTANT: This file should be generated BEFORE production deployment.
+-- 
+-- Workflow:
+-- 1. During development: Hibernate manages schema (ddl-auto=update)
+-- 2. Before production:
+--    a. Freeze entity model (no more changes)
+--    b. Generate schema from dev database:
+--       pg_dump --schema-only --no-owner --no-acl -h localhost -U postgres booking_management > schema.sql
+--    c. Copy the generated schema into this file
+--    d. Set ddl-auto=none in production
+--    e. Enable Flyway migrations
+--
+-- Rule: Hibernate manages schema ONLY in dev. Flyway manages schema ONLY in prod.
+-- Never mix both in the same environment.
+--
+-- ============================================================================
+-- TODO: Replace this placeholder with actual schema generated from dev database
+-- ============================================================================
+
+-- Example structure (replace with actual pg_dump output):
+-- CREATE TABLE bookings (...);
+-- CREATE INDEX ...;
+

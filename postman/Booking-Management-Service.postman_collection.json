@@ -1,0 +1,1124 @@
+{
+	"info": {
+		"_postman_id": "booking-management-service-collection",
+		"name": "Booking Management Service",
+		"description": "Complete API collection for Booking Management Service\n\n**Authentication:**\n- All /v1/** endpoints require Bearer token in Authorization header\n- Use format: `Bearer {{authToken}}`\n- Default token: `user-123` (stub implementation)\n\n**Base URL:**\n- Default: http://localhost:8080\n- Override with {{baseUrl}} variable",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Public health check endpoint. No authentication required."
+					},
+					"response": [
+						{
+							"name": "Health Check Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/actuator/health",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"actuator",
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"status\": \"UP\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has status field\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			],
+			"description": "Health check endpoints (public, no auth required)"
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hotelId\": \"hotel-123\",\n    \"roomTypeId\": \"room-type-456\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1234567890\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							]
+						},
+						"description": "Create a new booking (minimal payload).\n\n**Required fields:**\n- hotelId, roomTypeId, checkIn, checkOut\n- guestName, guestEmail, guestPhone (or provide guests list)\n\n**Optional fields:**\n- occupancy, guests, offerId, priceSnapshot, policySnapshot, idempotencyKey, roomsCount, childrenAges"
+					},
+					"response": [
+						{
+							"name": "Booking Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"hotelId\": \"hotel-123\",\n    \"roomTypeId\": \"room-type-456\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1234567890\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"DRAFT\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has bookingId\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('bookingId');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    ",
+									"    // Save bookingId for later use",
+									"    pm.collectionVariables.set(\"bookingId\", jsonData.bookingId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Booking (Extended)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hotelId\": \"hotel-123\",\n    \"roomTypeId\": \"room-type-456\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1234567890\",\n    \"specialRequests\": \"Late check-in requested\",\n    \"occupancy\": {\n        \"adults\": 2,\n        \"children\": 1\n    },\n    \"guests\": [\n        {\n            \"name\": \"John Doe\",\n            \"email\": \"john.doe@example.com\",\n            \"phone\": \"+1234567890\"\n        },\n        {\n            \"name\": \"Jane Doe\",\n            \"email\": \"jane.doe@example.com\",\n            \"phone\": \"+1234567891\"\n        }\n    ],\n    \"offerId\": \"offer-789\",\n    \"roomsCount\": 1,\n    \"childrenAges\": [5],\n    \"priceSnapshot\": {\n        \"totalPrice\": {\n            \"amount\": 299.99,\n            \"currency\": \"USD\"\n        },\n        \"basePrice\": {\n            \"amount\": 250.00,\n            \"currency\": \"USD\"\n        },\n        \"taxes\": {\n            \"amount\": 30.00,\n            \"currency\": \"USD\"\n        },\n        \"fees\": {\n            \"amount\": 19.99,\n            \"currency\": \"USD\"\n        },\n        \"nights\": 3\n    },\n    \"policySnapshot\": {\n        \"cancellationPolicySummary\": \"Free cancellation until 24 hours before check-in\",\n        \"cancellationAllowed\": true,\n        \"checkInPolicy\": \"Check-in from 3:00 PM\",\n        \"checkOutPolicy\": \"Check-out until 11:00 AM\"\n    },\n    \"idempotencyKey\": \"unique-request-id-12345\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							]
+						},
+						"description": "Create a new booking with extended fields (occupancy, guests, snapshots, etc.)"
+					},
+					"response": [
+						{
+							"name": "Booking Created (Extended)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"hotelId\": \"hotel-123\",\n    \"roomTypeId\": \"room-type-456\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1234567890\",\n    \"occupancy\": {\n        \"adults\": 2,\n        \"children\": 1\n    },\n    \"offerId\": \"offer-789\",\n    \"priceSnapshot\": {\n        \"totalPrice\": {\n            \"amount\": 299.99,\n            \"currency\": \"USD\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"DRAFT\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.bookingId) {",
+									"    pm.collectionVariables.set(\"bookingId\", jsonData.bookingId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Booking",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"{{bookingId}}"
+							]
+						},
+						"description": "Get booking details by ID.\n\nReturns all booking information including extended fields (occupancy, guests, snapshots, etc.)"
+					},
+					"response": [
+						{
+							"name": "Booking Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"DRAFT\",\n    \"source\": \"OWNER\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"roomTypeId\": \"room-type-456\",\n    \"confirmationRef\": null,\n    \"occupancy\": {\n        \"adults\": 2,\n        \"children\": 1\n    },\n    \"guests\": [\n        {\n            \"name\": \"John Doe\",\n            \"email\": \"john.doe@example.com\",\n            \"phone\": \"+1234567890\"\n        }\n    ],\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1234567890\",\n    \"offerId\": \"offer-789\",\n    \"priceSnapshot\": {\n        \"totalPrice\": {\n            \"amount\": 299.99,\n            \"currency\": \"USD\"\n        },\n        \"basePrice\": {\n            \"amount\": 250.00,\n            \"currency\": \"USD\"\n        },\n        \"taxes\": {\n            \"amount\": 30.00,\n            \"currency\": \"USD\"\n        },\n        \"fees\": {\n            \"amount\": 19.99,\n            \"currency\": \"USD\"\n        },\n        \"nights\": 3\n    },\n    \"policySnapshot\": {\n        \"cancellationPolicySummary\": \"Free cancellation until 24 hours before check-in\",\n        \"cancellationAllowed\": true,\n        \"checkInPolicy\": \"Check-in from 3:00 PM\",\n        \"checkOutPolicy\": \"Check-out until 11:00 AM\"\n    },\n    \"roomsCount\": 1,\n    \"adults\": 2,\n    \"children\": 1,\n    \"childrenAges\": [5],\n    \"leadGuest\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"phone\": \"+1234567890\"\n    },\n    \"supplierRateKey\": null,\n    \"expiresAt\": \"2024-12-24T10:15:00Z\",\n    \"nextActions\": [\"CONFIRM_REQUIRED\"]\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has bookingId\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('bookingId');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('checkIn');",
+									"    pm.expect(jsonData).to.have.property('checkOut');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Confirm Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}/confirm",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"{{bookingId}}",
+								"confirm"
+							]
+						},
+						"description": "Confirm a booking. This triggers the booking confirmation flow:\n\n1. **State Transition:** DRAFT → RECHECKING → PENDING_CONFIRMATION → CONFIRMED\n2. **Path Selection:**\n   - If booking has supplierCode → Uses SUPPLIER path (calls supplier adapter)\n   - Otherwise → Uses OWNER path (calls owner inventory adapter)\n3. **Recheck:** Validates availability and pricing\n4. **Confirmation:** Creates booking with supplier or reserves owner inventory\n\n**Idempotent:** If booking is already CONFIRMED, returns current state.\n\n**Optional Request Body:**\n- `idempotencyKey` (optional) - for safe retries\n\n**Response Codes:**\n- 200 OK: Booking confirmed successfully\n- 409 Conflict: Booking failed (e.g., sold out, price changed)"
+					},
+					"response": [
+						{
+							"name": "Booking Confirmed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/confirm",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"confirm"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"CONFIRMED\",\n    \"confirmationRef\": \"OWN-abc123def456\",\n    \"failureReason\": null\n}"
+						},
+						{
+							"name": "Booking Failed (Price Changed)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/confirm",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"confirm"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"FAILED\",\n    \"confirmationRef\": null,\n    \"failureReason\": \"Price has changed from the original offer: Price increased by $50\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 409\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.test(\"Response has bookingId and status\", function () {",
+									"    pm.expect(jsonData).to.have.property('bookingId');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"});",
+									"",
+									"// Store booking status",
+									"if (jsonData.status) {",
+									"    pm.collectionVariables.set(\"bookingStatus\", jsonData.status);",
+									"}",
+									"",
+									"// If status is CONFIRMED, should have confirmationRef",
+									"if (jsonData.status === 'CONFIRMED') {",
+									"    pm.test(\"Confirmed booking has confirmationRef\", function () {",
+									"        pm.expect(jsonData).to.have.property('confirmationRef');",
+									"    });",
+									"}",
+									"",
+									"// If status is FAILED, should have failureReason",
+									"if (jsonData.status === 'FAILED') {",
+									"    pm.test(\"Failed booking has failureReason\", function () {",
+									"        pm.expect(jsonData).to.have.property('failureReason');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Confirm Booking (with Idempotency)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"idempotencyKey\": \"confirm-request-12345\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}/confirm",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"{{bookingId}}",
+								"confirm"
+							]
+						},
+						"description": "Confirm booking with idempotency key for safe retries."
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"{{bookingId}}",
+								"cancel"
+							]
+						},
+						"description": "Cancel a booking.\n\n**Requirements:**\n- Booking must be in CONFIRMED status\n- User must own the booking\n\n**Idempotent:** If booking is already CANCELLED, returns current state."
+					},
+					"response": [
+						{
+							"name": "Booking Cancelled",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/550e8400-e29b-41d4-a716-446655440000/cancel",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"bookings",
+										"550e8400-e29b-41d4-a716-446655440000",
+										"cancel"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"status\": \"CANCELLED\",\n    \"message\": \"Booking cancelled\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Booking is cancelled\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.equal('CANCELLED');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			],
+			"description": "Booking management endpoints"
+		},
+		{
+			"name": "Hotels",
+			"item": [
+				{
+					"name": "Get Hotel by Slug",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/hotels/{{hotelSlug}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"hotels",
+								"{{hotelSlug}}"
+							]
+						},
+						"description": "Get hotel information by slug.\n\n**Note:** This is a stub implementation. Returns mock hotel data."
+					},
+					"response": [
+						{
+							"name": "Hotel Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/hotels/grand-hotel-paris",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"hotels",
+										"grand-hotel-paris"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"slug\": \"grand-hotel-paris\",\n    \"hotelId\": \"hotel-123\",\n    \"name\": \"Grand Hotel Paris\",\n    \"city\": \"Paris\",\n    \"country\": \"France\",\n    \"addressLine\": \"123 Champs-Élysées\",\n    \"images\": [\n        \"https://example.com/hotel1.jpg\",\n        \"https://example.com/hotel2.jpg\"\n    ],\n    \"amenities\": [\n        \"WiFi\",\n        \"Pool\",\n        \"Gym\",\n        \"Spa\"\n    ],\n    \"policiesSummary\": \"Free cancellation until 24 hours before check-in\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has hotel information\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('slug');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			],
+			"description": "Hotel information endpoints"
+		},
+		{
+			"name": "Offers",
+			"item": [
+				{
+					"name": "Search Offers",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guests\": 2,\n    \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/hotels/{{hotelSlug}}/offers:search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"hotels",
+								"{{hotelSlug}}",
+								"offers:search"
+							]
+						},
+						"description": "Search offers for a hotel.\n\n**Required fields:**\n- checkIn, checkOut, guests\n\n**Optional fields:**\n- roomsCount (defaults to 1)\n\n**Note:** This is a stub implementation. Returns mock offer data."
+					},
+					"response": [
+						{
+							"name": "Offers Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guests\": 2,\n    \"roomsCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/hotels/grand-hotel-paris/offers:search",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"hotels",
+										"grand-hotel-paris",
+										"offers:search"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"offers\": [\n        {\n            \"offerId\": \"offer-123\",\n            \"source\": \"OWNER\",\n            \"hotelId\": \"hotel-123\",\n            \"roomTypeId\": \"room-type-456\",\n            \"checkIn\": \"2024-12-25\",\n            \"checkOut\": \"2024-12-28\",\n            \"totalPrice\": {\n                \"amount\": 299.99,\n                \"currency\": \"USD\"\n            },\n            \"cancellationPolicySummary\": \"Free cancellation until 24 hours before check-in\"\n        },\n        {\n            \"offerId\": \"offer-456\",\n            \"source\": \"SUPPLIER\",\n            \"hotelId\": \"hotel-123\",\n            \"roomTypeId\": \"room-type-789\",\n            \"checkIn\": \"2024-12-25\",\n            \"checkOut\": \"2024-12-28\",\n            \"totalPrice\": {\n                \"amount\": 279.99,\n                \"currency\": \"USD\"\n            },\n            \"cancellationPolicySummary\": \"Non-refundable\"\n        }\n    ]\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has offers array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('offers');",
+									"    pm.expect(jsonData.offers).to.be.an('array');",
+									"});",
+									"",
+									"// Store first offerId if available",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.offers && jsonData.offers.length > 0 && jsonData.offers[0].offerId) {",
+									"    pm.collectionVariables.set(\"offerId\", jsonData.offers[0].offerId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Recheck Offer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"offerId\": \"{{offerId}}\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guests\": 2,\n    \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/offers:recheck",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"offers:recheck"
+							]
+						},
+						"description": "Recheck offer availability and validity.\n\n**Required fields:**\n- checkIn, checkOut, guests\n\n**Optional fields:**\n- offerId (or provide offerPayload)\n- roomsCount (defaults to 1)\n\n**Possible results:**\n- OK: Offer is still available\n- PRICE_CHANGED: Price has changed from original\n- SOLD_OUT: Room is no longer available\n\n**Note:** This is a stub implementation."
+					},
+					"response": [
+						{
+							"name": "Offer Available (OK)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"offerId\": \"offer-123\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guests\": 2,\n    \"roomsCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/offers:recheck",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"offers:recheck"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"result\": \"OK\",\n    \"offer\": {\n        \"offerId\": \"offer-123\",\n        \"source\": \"OWNER\",\n        \"hotelId\": \"hotel-123\",\n        \"roomTypeId\": \"room-type-456\",\n        \"checkIn\": \"2024-12-25\",\n        \"checkOut\": \"2024-12-28\",\n        \"totalPrice\": {\n            \"amount\": 299.99,\n            \"currency\": \"USD\"\n        },\n        \"cancellationPolicySummary\": \"Free cancellation until 24 hours before check-in\"\n    },\n    \"message\": \"Offer is still available\"\n}"
+						},
+						{
+							"name": "Price Changed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"offerId\": \"offer-123\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guests\": 2\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/offers:recheck",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"offers:recheck"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"result\": \"PRICE_CHANGED\",\n    \"offer\": {\n        \"offerId\": \"offer-123\",\n        \"source\": \"OWNER\",\n        \"hotelId\": \"hotel-123\",\n        \"roomTypeId\": \"room-type-456\",\n        \"checkIn\": \"2024-12-25\",\n        \"checkOut\": \"2024-12-28\",\n        \"totalPrice\": {\n            \"amount\": 349.99,\n            \"currency\": \"USD\"\n        }\n    },\n    \"message\": \"Price has changed from $299.99 to $349.99\"\n}"
+						},
+						{
+							"name": "Sold Out",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"offerId\": \"offer-123\",\n    \"checkIn\": \"2024-12-25\",\n    \"checkOut\": \"2024-12-28\",\n    \"guests\": 2\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/offers:recheck",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"offers:recheck"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"result\": \"SOLD_OUT\",\n    \"offer\": null,\n    \"message\": \"Room is sold out or no longer available\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has result field\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('result');",
+									"    pm.expect(jsonData.result).to.be.oneOf(['OK', 'PRICE_CHANGED', 'SOLD_OUT']);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			],
+			"description": "Offer search and recheck endpoints"
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "user-123",
+			"type": "string"
+		},
+		{
+			"key": "bookingId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "hotelSlug",
+			"value": "grand-hotel-paris",
+			"type": "string"
+		},
+		{
+			"key": "offerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bookingStatus",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+
