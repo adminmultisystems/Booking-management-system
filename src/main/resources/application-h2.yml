@@ -1,13 +1,12 @@
+# H2 Database Configuration for Development
+# Use this profile if you don't want to install PostgreSQL
+# Run with: java -jar app.jar --spring.profiles.active=h2
+
 spring:
   application:
     name: Hotelsystems.ai
-  
-  # Default to H2 for local development (no PostgreSQL required)
-  profiles:
-    active: h2
 
-  # Database Configuration (Default - H2 for local development)
-  # For PostgreSQL, use profile: postgres or set SPRING_PROFILES_ACTIVE=postgres
+  # H2 Database Configuration (In-Memory)
   datasource:
     url: jdbc:h2:mem:hotelsystems;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
@@ -32,9 +31,8 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
 
-# Pricing Intelligence Configuration (Optional)
-# Dummy pricing is used by default for local/testing - no external API calls are made
-# Uncomment and configure only if you need real pricing API integration
+# Pricing Intelligence Configuration (Optional for local/testing)
+# Dummy pricing is used by default - no external API calls are made
 # pricing:
 #   intelligence:
 #     base-url: https://api.pricing-intelligence.example.com
