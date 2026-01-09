@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
  * Service for managing hotels.
  */
 @Service
-public class HotelService {
+public class OwnerHotelService {
     
     private final HotelRepository hotelRepository;
     
-    public HotelService(HotelRepository hotelRepository) {
+    public OwnerHotelService(HotelRepository hotelRepository) {
         this.hotelRepository = hotelRepository;
     }
     

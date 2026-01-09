@@ -3,7 +3,7 @@ package com.hotelsystems.ai.bookingmanagement.ownerinventory.controller;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelRequest;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelResponse;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelUpdateRequest;
-import com.hotelsystems.ai.bookingmanagement.ownerinventory.service.HotelService;
+import com.hotelsystems.ai.bookingmanagement.ownerinventory.service.OwnerHotelService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/v1/admin/hotels")
-public class HotelController {
+public class OnwerHotelController {
     
-    private final HotelService hotelService;
+    private final OwnerHotelService hotelService;
     
-    public HotelController(HotelService hotelService) {
+    public OnwerHotelController(OwnerHotelService hotelService) {
         this.hotelService = hotelService;
     }
     

@@ -17,7 +17,6 @@ import java.util.UUID;
  * This will be replaced by engineers with real owner inventory API integration.
  */
 @Component
-@Primary
 @Slf4j
 public class StubOwnerInventoryAdapter implements OwnerInventoryAdapter {
     
