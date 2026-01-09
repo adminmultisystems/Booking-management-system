@@ -11,6 +11,9 @@ This is a Spring Boot microservice for booking management with supplier integrat
 - Flyway (database migrations)
 - JPA/Hibernate
 
+
+
+
 ## 🎯 Phase 1 Scope
 
 Phase 1 implements **ONLY** the following:
