@@ -1,0 +1,425 @@
+{
+	"info": {
+		"_postman_id": "booking-management-api-collection",
+		"name": "Booking Management API",
+		"description": "Postman collection for testing the Booking Management Microservice with HotelBeds and TravelLanda suppliers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Create Booking - HotelBeds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has booking ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('supplierBookingId');",
+									"    pm.expect(jsonData.bookingStatus).to.eql('CONFIRMED');",
+									"});",
+									"",
+									"// Save booking ID for later use",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('bookingId', jsonData.supplierBookingId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"hotel-123\",\n  \"checkInDate\": \"2024-12-01\",\n  \"checkOutDate\": \"2024-12-05\",\n  \"numberOfGuests\": 2,\n  \"customerName\": \"John Doe\",\n  \"customerEmail\": \"john.doe@example.com\",\n  \"customerPhone\": \"+1234567890\",\n  \"offerPayloadJson\": \"{\\\"supplierCode\\\":\\\"HOTELBEDS\\\",\\\"supplierHotelId\\\":\\\"HB-HOTEL-123\\\",\\\"rateKey\\\":\\\"RATE-KEY-456\\\",\\\"roomCode\\\":\\\"ROOM-789\\\",\\\"currency\\\":\\\"USD\\\",\\\"expectedTotalPriceMinor\\\":10000}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"bookings"
+							]
+						},
+						"description": "Creates a new booking with HotelBeds supplier. The offerPayloadJson contains the supplier-specific rate information."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking - TravelLanda",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has booking ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('supplierBookingId');",
+									"    pm.expect(jsonData.bookingStatus).to.eql('CONFIRMED');",
+									"});",
+									"",
+									"// Save booking ID for later use",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('travelLandaBookingId', jsonData.supplierBookingId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"hotel-456\",\n  \"checkInDate\": \"2024-12-10\",\n  \"checkOutDate\": \"2024-12-15\",\n  \"numberOfGuests\": 2,\n  \"customerName\": \"Jane Smith\",\n  \"customerEmail\": \"jane.smith@example.com\",\n  \"customerPhone\": \"+9876543210\",\n  \"offerPayloadJson\": \"{\\\"supplierCode\\\":\\\"TRAVELLANDA\\\",\\\"supplierHotelId\\\":\\\"TL-HOTEL-456\\\",\\\"rateKey\\\":\\\"RATE-KEY-789\\\",\\\"roomCode\\\":\\\"ROOM-012\\\",\\\"currency\\\":\\\"INR\\\",\\\"expectedTotalPriceMinor\\\":50000}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"bookings"
+							]
+						},
+						"description": "Creates a new booking with TravelLanda supplier. The offerPayloadJson contains the supplier-specific rate information."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking - Invalid JSON Payload",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error message about invalid payload\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message || jsonData.error).to.include('payload');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"hotel-123\",\n  \"checkInDate\": \"2024-12-01\",\n  \"checkOutDate\": \"2024-12-05\",\n  \"numberOfGuests\": 2,\n  \"customerName\": \"John Doe\",\n  \"customerEmail\": \"john.doe@example.com\",\n  \"customerPhone\": \"+1234567890\",\n  \"offerPayloadJson\": \"{ invalid json }\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"bookings"
+							]
+						},
+						"description": "Tests error handling for invalid JSON in offerPayloadJson field."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking - Missing Supplier Code",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error message about missing supplier\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message || jsonData.error).to.include('supplier');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"hotel-123\",\n  \"checkInDate\": \"2024-12-01\",\n  \"checkOutDate\": \"2024-12-05\",\n  \"numberOfGuests\": 2,\n  \"customerName\": \"John Doe\",\n  \"customerEmail\": \"john.doe@example.com\",\n  \"customerPhone\": \"+1234567890\",\n  \"offerPayloadJson\": \"{\\\"supplierHotelId\\\":\\\"HB-HOTEL-123\\\",\\\"rateKey\\\":\\\"RATE-KEY-456\\\",\\\"roomCode\\\":\\\"ROOM-789\\\"}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"bookings"
+							]
+						},
+						"description": "Tests error handling when supplierCode is missing from offerPayloadJson and booking.supplierCode is also not set."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has status information\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('supplierBookingId');",
+									"    pm.expect(jsonData).to.have.property('bookingStatus');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/{{bookingId}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"{{bookingId}}",
+								"status"
+							]
+						},
+						"description": "Retrieves the status of a booking using the supplier booking ID. Replace {{bookingId}} with an actual booking ID from a create booking response."
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/{{bookingId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"{{bookingId}}"
+							]
+						},
+						"description": "Cancels a booking using the supplier booking ID. Returns 204 No Content on success."
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 or 404\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/INVALID-BOOKING-ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"INVALID-BOOKING-ID"
+							]
+						},
+						"description": "Tests error handling when trying to cancel a non-existent booking."
+					},
+					"response": []
+				}
+			],
+			"description": "Collection of requests for booking management operations"
+		},
+		{
+			"name": "Supplier Operations (Direct)",
+			"item": [
+				{
+					"name": "Create Booking with Fallback Supplier Code",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"hotel-789\",\n  \"checkInDate\": \"2024-12-20\",\n  \"checkOutDate\": \"2024-12-25\",\n  \"numberOfGuests\": 1,\n  \"customerName\": \"Test User\",\n  \"customerEmail\": \"test@example.com\",\n  \"customerPhone\": \"+1111111111\",\n  \"supplierCode\": \"HOTELBEDS\",\n  \"offerPayloadJson\": \"{\\\"supplierHotelId\\\":\\\"HB-HOTEL-789\\\",\\\"rateKey\\\":\\\"RATE-KEY-999\\\",\\\"roomCode\\\":\\\"ROOM-111\\\"}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"bookings"
+							]
+						},
+						"description": "Creates a booking where supplierCode is provided as a fallback in the booking entity (not in offerPayloadJson)."
+					},
+					"response": []
+				}
+			],
+			"description": "Requests that test supplier-specific features and edge cases"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
+
