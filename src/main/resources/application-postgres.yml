@@ -1,0 +1,33 @@
+# PostgreSQL Database Configuration for Production
+# Use this profile for production: --spring.profiles.active=postgres
+
+spring:
+  application:
+    name: Hotelsystems.ai
+
+  # PostgreSQL Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hotelsystems
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  # JPA/Hibernate Configuration for PostgreSQL
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+# Pricing Intelligence Configuration (Optional)
+# Dummy pricing is used by default for local/testing - no external API calls are made
+# Uncomment and configure only if you need real pricing API integration
+# pricing:
+#   intelligence:
+#     base-url: https://api.pricing-intelligence.example.com
+#     api-key: your-api-key-here
+#     timeout-ms: 5000
+
