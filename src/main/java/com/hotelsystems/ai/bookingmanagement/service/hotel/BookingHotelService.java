@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class BookingHotelService {
     
-    private final StubHotelCatalog hotelCatalog;
+    private final HotelCatalog hotelCatalog;
     
     /**
      * Get hotel by slug

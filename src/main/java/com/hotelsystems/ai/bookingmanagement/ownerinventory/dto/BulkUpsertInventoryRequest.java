@@ -1,5 +1,6 @@
 package com.hotelsystems.ai.bookingmanagement.ownerinventory.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,9 +15,11 @@ public class BulkUpsertInventoryRequest {
     private String roomTypeId;
     
     @NotNull(message = "startDate is required")
+    @FutureOrPresent(message = "startDate must be today or a future date")
     private LocalDate startDate;
     
     @NotNull(message = "endDate is required")
+    @FutureOrPresent(message = "endDate must be today or a future date")
     private LocalDate endDate;
     
     @Min(value = 0, message = "allotmentQty must be >= 0")

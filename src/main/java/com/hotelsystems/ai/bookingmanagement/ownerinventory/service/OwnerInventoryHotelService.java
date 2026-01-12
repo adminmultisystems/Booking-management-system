@@ -17,11 +17,19 @@ import org.springframework.transaction.annotation.Transactional;
  * Handles hotel creation and updates for admin operations.
  */
 @Service
+<<<<<<<< HEAD:src/main/java/com/hotelsystems/ai/bookingmanagement/ownerinventory/service/OwnerInventoryHotelService.java
 public class OwnerInventoryHotelService {
     
     private final HotelRepository hotelRepository;
     
     public OwnerInventoryHotelService(HotelRepository hotelRepository) {
+========
+public class OwnerHotelService {
+    
+    private final HotelRepository hotelRepository;
+    
+    public OwnerHotelService(HotelRepository hotelRepository) {
+>>>>>>>> origin/sagar:src/main/java/com/hotelsystems/ai/bookingmanagement/ownerinventory/service/OwnerHotelService.java
         this.hotelRepository = hotelRepository;
     }
     

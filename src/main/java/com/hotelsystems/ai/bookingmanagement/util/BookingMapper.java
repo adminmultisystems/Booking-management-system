@@ -241,6 +241,7 @@ public class BookingMapper {
                 .supplierRateKey(booking.getSupplierRateKey())
                 .expiresAt(booking.getExpiresAt())
                 .nextActions(nextActions)
+                .idempotencyKey(booking.getIdempotencyKey())
                 .build();
     }
 }

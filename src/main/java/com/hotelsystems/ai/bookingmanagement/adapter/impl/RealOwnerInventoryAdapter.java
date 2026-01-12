@@ -1,23 +1,28 @@
 package com.hotelsystems.ai.bookingmanagement.adapter.impl;
 
-import com.hotelsystems.ai.bookingmanagement.adapter.OwnerInventoryAdapter;
-import com.hotelsystems.ai.bookingmanagement.adapter.RecheckStatus;
+import com.hotelsystems.ai.bookingmanagement.domain.entity.BookingEntity;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.availability.AvailabilityService;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.reservation.ReservationService;
+import com.hotelsystems.ai.bookingmanagement.service.adapter.OwnerInventoryAdapter;
+import com.hotelsystems.ai.bookingmanagement.service.adapter.RecheckResult;
+import com.hotelsystems.ai.bookingmanagement.service.adapter.RecheckStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 /**
  * Real implementation of OwnerInventoryAdapter.
  * This adapter integrates with the owner inventory services to provide
- * inventory checking, reservation, and release functionality.
+ * real inventory checking, reservation, and release functionality.
+ * 
+ * This replaces the StubOwnerInventoryAdapter and provides actual integration
+ * with the owner inventory system (AvailabilityService and ReservationService).
  */
-@Service
+@Component
 @Primary
+@Slf4j
 public class RealOwnerInventoryAdapter implements OwnerInventoryAdapter {
     
     private final AvailabilityService availabilityService;
@@ -31,119 +36,127 @@ public class RealOwnerInventoryAdapter implements OwnerInventoryAdapter {
     }
     
     /**
-     * Rechecks inventory availability for a booking.
+     * Recheck booking availability and validity with owner inventory.
      * 
-     * @param hotelId The hotel identifier
-     * @param roomTypeId The room type identifier
-     * @param checkIn Check-in date
-     * @param checkOut Check-out date
-     * @return RecheckStatus indicating if the booking is still available
+     * @param booking Booking entity to recheck
+     * @return RecheckResult with status and details
      */
-    public RecheckStatus recheck(UUID hotelId, UUID roomTypeId, LocalDate checkIn, LocalDate checkOut) {
-        // Validate hotelId, roomTypeId, checkIn, checkOut present
-        if (hotelId == null || roomTypeId == null || checkIn == null || checkOut == null) {
-            return RecheckStatus.SOLD_OUT;
+    @Override
+    public RecheckResult recheck(BookingEntity booking) {
+        log.info("Rechecking owner inventory - bookingId: {}, hotelId: {}, roomTypeId: {}",
+                booking.getId(), booking.getHotelId(), booking.getRoomTypeId());
+        
+        // Extract booking details
+        String hotelId = booking.getHotelId();
+        String roomTypeId = booking.getRoomTypeId();
+        java.time.LocalDate checkIn = booking.getCheckIn();
+        java.time.LocalDate checkOut = booking.getCheckOut();
+        
+        // Validate required fields
+        if (hotelId == null || hotelId.trim().isEmpty() ||
+            roomTypeId == null || roomTypeId.trim().isEmpty() ||
+            checkIn == null || checkOut == null) {
+            log.warn("Invalid booking data for recheck - bookingId: {}", booking.getId());
+            return RecheckResult.builder()
+                    .status(RecheckStatus.SOLD_OUT)
+                    .message("Invalid booking data: missing hotelId, roomTypeId, or dates")
+                    .build();
         }
         
-        // roomsCount = 1 for MVP
-        int roomsCount = 1;
+        // Get roomsCount from booking (default to 1 if not specified)
+        int roomsCount = (booking.getRoomsCount() != null && booking.getRoomsCount() > 0) 
+                ? booking.getRoomsCount() 
+                : 1;
         
-        // Convert UUID to String for service calls
-        String hotelIdStr = hotelId.toString();
-        String roomTypeIdStr = roomTypeId.toString();
-        
-        // Check if bookable
+        // Check if bookable using AvailabilityService
         boolean bookable = availabilityService.isBookable(
-            hotelIdStr, roomTypeIdStr, checkIn, checkOut, roomsCount);
+                hotelId, roomTypeId, checkIn, checkOut, roomsCount);
         
-        // If not bookable -> return SOLD_OUT
         if (!bookable) {
-            return RecheckStatus.SOLD_OUT;
+            log.warn("Owner inventory not available - bookingId: {}, hotelId: {}, roomTypeId: {}, checkIn: {}, checkOut: {}",
+                    booking.getId(), hotelId, roomTypeId, checkIn, checkOut);
+            return RecheckResult.builder()
+                    .status(RecheckStatus.SOLD_OUT)
+                    .message("Room is sold out or no longer available for the requested dates")
+                    .build();
         }
         
-        // Else return OK
-        return RecheckStatus.OK;
+        log.info("Owner inventory available - bookingId: {}", booking.getId());
+        return RecheckResult.builder()
+                .status(RecheckStatus.OK)
+                .message("Owner inventory recheck successful - room is available")
+                .build();
     }
     
     /**
-     * Reserves inventory and confirms the reservation.
+     * Reserve and confirm booking with owner inventory.
      * 
-     * @param bookingId The booking identifier
-     * @param hotelId The hotel identifier
-     * @param roomTypeId The room type identifier
-     * @param checkIn Check-in date
-     * @param checkOut Check-out date
-     * @return Reservation confirmation ID in format "OWN-RES-{reservationId}"
+     * @param booking Booking entity to reserve and confirm
+     * @return Internal confirmation reference in format "OWN-RES-{reservationId}"
      */
-    public String reserveAndConfirm(UUID bookingId, UUID hotelId, UUID roomTypeId, LocalDate checkIn, LocalDate checkOut) {
-        // Convert UUID to String for service calls
-        String hotelIdStr = hotelId.toString();
-        String roomTypeIdStr = roomTypeId.toString();
+    @Override
+    public String reserveAndConfirm(BookingEntity booking) {
+        log.info("Reserving and confirming owner inventory - bookingId: {}, hotelId: {}, roomTypeId: {}",
+                booking.getId(), booking.getHotelId(), booking.getRoomTypeId());
         
-        // Reserve inventory
+        // Extract booking details
+        UUID bookingId = booking.getId();
+        String hotelId = booking.getHotelId();
+        String roomTypeId = booking.getRoomTypeId();
+        java.time.LocalDate checkIn = booking.getCheckIn();
+        java.time.LocalDate checkOut = booking.getCheckOut();
+        
+        // Validate required fields
+        if (hotelId == null || hotelId.trim().isEmpty() ||
+            roomTypeId == null || roomTypeId.trim().isEmpty() ||
+            checkIn == null || checkOut == null) {
+            throw new IllegalArgumentException("Invalid booking data: missing hotelId, roomTypeId, or dates");
+        }
+        
+        // Get roomsCount from booking (default to 1 if not specified)
+        int roomsCount = (booking.getRoomsCount() != null && booking.getRoomsCount() > 0) 
+                ? booking.getRoomsCount() 
+                : 1;
+        
+        // Reserve inventory using ReservationService
         UUID reservationId = reservationService.reserve(
-            bookingId,
-            hotelIdStr,
-            roomTypeIdStr,
-            checkIn,
-            checkOut,
-            1 // roomsCount = 1 for MVP
+                bookingId,
+                hotelId,
+                roomTypeId,
+                checkIn,
+                checkOut,
+                roomsCount
         );
         
-        // Return "OWN-RES-" + reservationId
-        return "OWN-RES-" + reservationId;
+        // Return confirmation reference in format "OWN-RES-{reservationId}"
+        String confirmationRef = "OWN-RES-" + reservationId;
+        log.info("Owner inventory reserved and confirmed - bookingId: {}, confirmationRef: {}", 
+                bookingId, confirmationRef);
+        
+        return confirmationRef;
     }
     
     /**
-     * Releases inventory for a booking.
+     * Release booking from owner inventory.
      * 
-     * @param bookingId The booking identifier
+     * @param booking Booking entity to release
      */
-    public void release(UUID bookingId) {
-        reservationService.releaseByBookingId(bookingId);
-    }
-    
-    // Implementation of OwnerInventoryAdapter interface methods
-    // These methods delegate to the appropriate services
-    
     @Override
-    public boolean isAvailable(UUID hotelId, UUID roomTypeId, LocalDate checkIn, LocalDate checkOut) {
-        return availabilityService.isBookable(
-            hotelId.toString(), roomTypeId.toString(), checkIn, checkOut, 1);
-    }
-    
-    @Override
-    public boolean reserveInventory(UUID hotelId, UUID roomTypeId, LocalDate checkIn, LocalDate checkOut) {
-        try {
-            // Generate a temporary booking ID for reservation
-            UUID bookingId = UUID.randomUUID();
-            String confirmationId = reserveAndConfirm(bookingId, hotelId, roomTypeId, checkIn, checkOut);
-            return confirmationId != null && !confirmationId.isEmpty();
-        } catch (Exception e) {
-            return false;
+    public void release(BookingEntity booking) {
+        log.info("Releasing owner inventory - bookingId: {}, confirmationRef: {}",
+                booking.getId(), booking.getInternalConfirmationRef());
+        
+        UUID bookingId = booking.getId();
+        
+        if (bookingId == null) {
+            log.warn("Cannot release inventory - bookingId is null");
+            return;
         }
-    }
-    
-    @Override
-    public void releaseInventory(UUID hotelId, UUID roomTypeId, LocalDate checkIn, LocalDate checkOut) {
-        // Note: This method requires bookingId to release, but we don't have it here.
-        // This is a limitation - in a real implementation, you'd need to track bookingId.
-        // For now, this method cannot fully release without bookingId.
-        // Consider using a different approach or storing bookingId mapping.
-    }
-    
-    @Override
-    public BigDecimal calculatePrice(UUID hotelId, UUID roomTypeId, LocalDate checkIn, LocalDate checkOut) {
-        // TODO: Implement pricing calculation using PricingService
-        // For now, return zero
-        return BigDecimal.ZERO;
-    }
-    
-    @Override
-    public BigDecimal getPriceForDate(UUID hotelId, UUID roomTypeId, LocalDate date) {
-        // TODO: Implement per-date pricing using PricingService
-        // For now, return zero
-        return BigDecimal.ZERO;
+        
+        // Release inventory using ReservationService
+        reservationService.releaseByBookingId(bookingId);
+        
+        log.info("Owner inventory released - bookingId: {}", bookingId);
     }
 }
 

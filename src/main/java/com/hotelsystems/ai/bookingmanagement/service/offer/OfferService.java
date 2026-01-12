@@ -10,7 +10,6 @@ import com.hotelsystems.ai.bookingmanagement.enums.OfferSource;
 import com.hotelsystems.ai.bookingmanagement.exception.BadRequestException;
 import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.OfferRecheckAdapter;
 import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.OfferSearchAdapter;
-import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.impl.OwnerOfferAdapterStub;
 import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.impl.SupplierOfferAdapterStub;
 import com.hotelsystems.ai.bookingmanagement.service.hotel.BookingHotelService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,8 @@ public class OfferService {
     private final BookingHotelService hotelService;
     private final OfferRoutingService offerRoutingService;
     private final SupplierOfferAdapterStub supplierOfferAdapter;
-    private final OwnerOfferAdapterStub ownerOfferAdapter;
+    private final OfferSearchAdapter ownerOfferSearchAdapter; // Use interface - @Primary will select RealOwnerOfferAdapter
+    private final OfferRecheckAdapter ownerOfferRecheckAdapter; // Use interface - @Primary will select RealOwnerOfferAdapter
     
     /**
      * Search for offers by hotel slug
@@ -132,7 +132,7 @@ public class OfferService {
         if (source == OfferSource.SUPPLIER) {
             return supplierOfferAdapter;
         } else {
-            return ownerOfferAdapter;
+            return ownerOfferSearchAdapter;
         }
     }
     
@@ -148,11 +148,11 @@ public class OfferService {
             return supplierOfferAdapter;
         } else if (offerId != null && offerId.startsWith("OWN-")) {
             log.debug("Using owner adapter for offerId: {}", offerId);
-            return ownerOfferAdapter;
+            return ownerOfferRecheckAdapter;
         } else {
             // Safe default: owner adapter
             log.warn("Unknown offerId prefix, defaulting to owner adapter: {}", offerId);
-            return ownerOfferAdapter;
+            return ownerOfferRecheckAdapter;
         }
     }
     

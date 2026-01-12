@@ -129,4 +129,9 @@ public class BookingResponse {
      * Next actions information
      */
     private List<String> nextActions;
+    
+    /**
+     * Idempotency key (if provided during booking creation)
+     */
+    private String idempotencyKey;
 }

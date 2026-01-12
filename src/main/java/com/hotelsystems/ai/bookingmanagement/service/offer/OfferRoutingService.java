@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
  * 
  * Determines whether to route offer requests to SUPPLIER or OWNER adapters.
  * 
- * TODO: This is a stub implementation. Engineer 1 will implement proper supplier mapping
- * logic via admin endpoints. For now, uses simple heuristics:
+ * Note: This is a stub implementation. Proper supplier mapping logic will be implemented
+ * via admin endpoints. For now, uses simple heuristics:
  * - If slug contains "supplier" OR hotelId ends with "S" => SUPPLIER
  * - Otherwise => OWNER (safe default)
  */
@@ -28,7 +28,7 @@ public class OfferRoutingService {
     public OfferSource decideSourceForHotel(String hotelId, String slug) {
         log.debug("Deciding offer source for hotelId: {}, slug: {}", hotelId, slug);
         
-        // TODO: Replace with proper supplier mapping lookup (Engineer 1 scope)
+        // Note: Will be replaced with proper supplier mapping lookup in future implementation
         // For now, use simple stub heuristics:
         
         // Check if slug contains "supplier"

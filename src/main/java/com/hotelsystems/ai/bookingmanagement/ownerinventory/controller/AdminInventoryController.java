@@ -4,16 +4,18 @@ import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.BulkUpsertInvent
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.InventoryAllotmentResponse;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.PricingQuote;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.entity.InventoryAllotmentEntity;
+import com.hotelsystems.ai.bookingmanagement.ownerinventory.entity.RoomTypeEntity;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.pricing.PricingIntelligenceClient;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.repository.InventoryAllotmentRepository;
+import com.hotelsystems.ai.bookingmanagement.ownerinventory.repository.RoomTypeRepository;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -25,12 +27,15 @@ public class AdminInventoryController {
     
     private final InventoryAllotmentRepository allotmentRepository;
     private final PricingIntelligenceClient pricingClient;
+    private final RoomTypeRepository roomTypeRepository;
     
     public AdminInventoryController(
             InventoryAllotmentRepository allotmentRepository,
-            PricingIntelligenceClient pricingClient) {
+            PricingIntelligenceClient pricingClient,
+            RoomTypeRepository roomTypeRepository) {
         this.allotmentRepository = allotmentRepository;
         this.pricingClient = pricingClient;
+        this.roomTypeRepository = roomTypeRepository;
     }
     
     /**
@@ -54,11 +59,56 @@ public class AdminInventoryController {
                 .body("allotmentQty must be >= 0");
         }
         
-        // Validate date range
+        // Get today's date for validation
+        LocalDate today = LocalDate.now();
+        
+        // Validate dates are not in the past (MUST be first check)
+        if (request.getStartDate() == null || request.getEndDate() == null) {
+            return ResponseEntity.badRequest()
+                .body("startDate and endDate are required");
+        }
+        
+        // Check if startDate is in the past
+        if (request.getStartDate().isBefore(today)) {
+            return ResponseEntity.badRequest()
+                .body(String.format("startDate (%s) cannot be in the past. Today's date is %s. Please use today or a future date.", 
+                    request.getStartDate(), today));
+        }
+        
+        // Check if endDate is in the past
+        if (request.getEndDate().isBefore(today)) {
+            return ResponseEntity.badRequest()
+                .body(String.format("endDate (%s) cannot be in the past. Today's date is %s. Please use today or a future date.", 
+                    request.getEndDate(), today));
+        }
+        
+        // Validate date range (startDate must be before endDate)
         if (request.getStartDate().isAfter(request.getEndDate()) || 
             request.getStartDate().equals(request.getEndDate())) {
             return ResponseEntity.badRequest()
                 .body("startDate must be before endDate");
+        }
+        
+        // Validate room type exists and belongs to this hotel
+        Optional<RoomTypeEntity> roomTypeOpt = roomTypeRepository.findById(request.getRoomTypeId());
+        if (roomTypeOpt.isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(String.format("Room type with id '%s' does not exist. Please create the room type first before setting inventory.", 
+                    request.getRoomTypeId()));
+        }
+        
+        RoomTypeEntity roomType = roomTypeOpt.get();
+        if (!roomType.getHotelId().equals(hotelId)) {
+            return ResponseEntity.badRequest()
+                .body(String.format("Room type '%s' does not belong to hotel '%s'. It belongs to hotel '%s'.", 
+                    request.getRoomTypeId(), hotelId, roomType.getHotelId()));
+        }
+        
+        // Check if room type is active
+        if (!roomType.isActive()) {
+            return ResponseEntity.badRequest()
+                .body(String.format("Room type '%s' is inactive. Cannot set inventory for inactive room types.", 
+                    request.getRoomTypeId()));
         }
         
         // Upsert one row per date from startDate (inclusive) to endDate (exclusive)
