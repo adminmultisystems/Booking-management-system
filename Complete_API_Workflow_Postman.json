@@ -1,16 +1,16 @@
 {
 	"info": {
-		"_postman_id": "complete-workflow-collection",
-		"name": "Hotelsystems.ai - Complete API Workflow",
-		"description": "Complete workflow for Hotelsystems.ai Booking Management System\n\n**Workflow Order:**\n1. Setup Phase: Create Hotel → Create Room Type → Set Inventory\n2. Search Phase: Get Hotel → Search Offers → Recheck Offer\n3. Booking Phase: Create Booking → Confirm Booking → Get Booking\n4. Management Phase: Update Inventory, Cancel Booking\n\n**Authentication:**\n- All /v1/** endpoints require: `Authorization: Bearer user-123`\n- Health check is public (no auth required)",
+		"_postman_id": "16-apis-collection-updated",
+		"name": "Hotelsystems.ai - 16 APIs Collection (Updated)",
+		"description": "Complete collection with all 16 APIs in correct workflow order\n\n**Total APIs: 16**\n- Health Check: 1 API\n- Admin APIs: 7 APIs\n- Public APIs: 7 APIs\n- Internal APIs: 1 API\n\n**Workflow:**\n1. Setup: Health → Create Hotel → Create Room Type → Set Inventory → Get Inventory\n2. Search: Get Hotel → Search Offers → Recheck Offer\n3. Booking: Create Booking → Get Booking → Confirm Booking → Cancel Booking\n4. Management: Update Hotel → Update Room Type → Update Inventory\n5. Internal: Get Pricing Quote\n\n**✨ New Features (Updated):**\n- ✅ **Idempotency Key**: Add `idempotencyKey` in Create Booking request for duplicate prevention\n- ✅ **Source Field**: Response includes `source` (OWNER/SUPPLIER) automatically set based on supplierCode\n- ✅ **Idempotency Key in Response**: Both CreateBookingResponse and BookingResponse include `idempotencyKey`\n- ✅ **Source Logic**: \n  - If `supplierCode` is null → `source = OWNER` (direct owner inventory)\n  - If `supplierCode` is provided → `source = SUPPLIER`\n\n**Authentication:**\n- All /v1/** endpoints require: `Authorization: Bearer user-123`",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "1. Setup Phase - Admin",
+			"name": "1. Health Check",
 			"item": [
 				{
-					"name": "1.1 Health Check",
+					"name": "Health Check",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -19,12 +19,17 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["actuator", "health"]
 						},
-						"description": "Check if server is running (No authentication required)"
+						"description": "API 1/16: Check if server is running (No authentication required)"
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "2. Admin - Hotel Management",
+			"item": [
 				{
-					"name": "1.2 Create Hotel",
+					"name": "Create Hotel",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -48,12 +53,46 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["v1", "admin", "hotels"]
 						},
-						"description": "Create a new hotel. The slug will be auto-generated from name (e.g., 'Grand Hotel Paris' → 'grand-hotel-paris')"
+						"description": "API 2/16: Create a new hotel. Slug auto-generated: 'Grand Hotel Paris' → 'grand-hotel-paris'"
 					},
 					"response": []
 				},
 				{
-					"name": "1.3 Create Room Type",
+					"name": "Update Hotel",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer user-123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Grand Hotel Paris - Updated\",\n    \"active\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/hotels/hotel-001",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "admin", "hotels", "hotel-001"]
+						},
+						"description": "API 3/16: Update hotel information (name, active status)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Admin - Room Type Management",
+			"item": [
+				{
+					"name": "Create Room Type",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -77,12 +116,46 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["v1", "admin", "hotels", "hotel-001", "room-types"]
 						},
-						"description": "Create a room type for the hotel. Use hotel-001 from previous step."
+						"description": "API 4/16: Create a room type for the hotel"
 					},
 					"response": []
 				},
 				{
-					"name": "1.4 Set Inventory (Bulk Upsert)",
+					"name": "Update Room Type",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer user-123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Deluxe Room - Updated\",\n    \"maxGuests\": 3,\n    \"active\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/room-types/DELUXE",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "admin", "room-types", "DELUXE"]
+						},
+						"description": "API 5/16: Update room type (name, maxGuests, active status)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Admin - Inventory Management",
+			"item": [
+				{
+					"name": "Set Inventory (Bulk Upsert)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -106,12 +179,12 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["v1", "admin", "hotels", "hotel-001", "inventory", "bulk-upsert"]
 						},
-						"description": "Set inventory for date range. Creates/updates inventory rows for each date from startDate (inclusive) to endDate (exclusive).\n\n**Important:** Dates must be today or in the future!"
+						"description": "API 6/16: Set inventory for date range. Creates/updates inventory rows for each date.\n\n**Important:** Dates must be today or in the future!"
 					},
 					"response": []
 				},
 				{
-					"name": "1.5 Get Inventory",
+					"name": "Get Inventory",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -140,302 +213,12 @@
 								}
 							]
 						},
-						"description": "Get inventory for hotel with optional filters"
-					},
-					"response": []
-				}
-			],
-			"description": "Admin setup phase - Create hotel, room types, and set inventory"
-		},
-		{
-			"name": "2. Search Phase - Public",
-			"item": [
-				{
-					"name": "2.1 Get Hotel by Slug",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/v1/hotels/grand-hotel-paris",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "hotels", "grand-hotel-paris"]
-						},
-						"description": "Get hotel information by slug. Slug is auto-generated from hotel name (lowercase, spaces → hyphens)"
+						"description": "API 7/16: Get inventory for hotel with optional filters (roomTypeId, start, end)\n\n**Save inventoryRowId from response for update operations!**"
 					},
 					"response": []
 				},
 				{
-					"name": "2.2 Search Offers",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"checkIn\": \"2025-01-20\",\n    \"checkOut\": \"2025-01-23\",\n    \"guests\": 2,\n    \"roomsCount\": 1\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/hotels/grand-hotel-paris/offers:search",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "hotels", "grand-hotel-paris", "offers:search"]
-						},
-						"description": "Search available offers for a hotel. Returns list of available room types with pricing.\n\n**Save the offerId from response for next step!**"
-					},
-					"response": []
-				},
-				{
-					"name": "2.3 Recheck Offer",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"offerId\": \"OWN-abc123def456\",\n    \"checkIn\": \"2025-01-20\",\n    \"checkOut\": \"2025-01-23\",\n    \"guests\": 2,\n    \"roomsCount\": 1\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/offers:recheck",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "offers:recheck"]
-						},
-						"description": "Recheck offer availability before booking. Use offerId from search offers response.\n\n**Possible results:**\n- OK: Offer still available\n- PRICE_CHANGED: Price changed\n- SOLD_OUT: No longer available"
-					},
-					"response": []
-				}
-			],
-			"description": "Search phase - Get hotel info, search offers, and recheck availability"
-		},
-		{
-			"name": "3. Booking Phase - Create & Confirm",
-			"item": [
-				{
-					"name": "3.1 Create Booking (Minimal)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"hotelId\": \"hotel-001\",\n    \"roomTypeId\": \"DELUXE\",\n    \"checkIn\": \"2025-01-20\",\n    \"checkOut\": \"2025-01-23\",\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1234567890\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/bookings",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "bookings"]
-						},
-						"description": "Create a booking in DRAFT status (minimal payload).\n\n**Save the bookingId from response for next steps!**"
-					},
-					"response": []
-				},
-				{
-					"name": "3.2 Create Booking (Extended)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"hotelId\": \"hotel-001\",\n    \"roomTypeId\": \"DELUXE\",\n    \"checkIn\": \"2025-01-20\",\n    \"checkOut\": \"2025-01-23\",\n    \"guestName\": \"Jane Smith\",\n    \"guestEmail\": \"jane.smith@example.com\",\n    \"guestPhone\": \"+9876543210\",\n    \"occupancy\": {\n        \"adults\": 2,\n        \"children\": 1\n    },\n    \"guests\": [\n        {\n            \"name\": \"Jane Smith\",\n            \"email\": \"jane.smith@example.com\",\n            \"phone\": \"+9876543210\"\n        },\n        {\n            \"name\": \"John Smith\",\n            \"email\": \"john.smith@example.com\",\n            \"phone\": \"+9876543211\"\n        }\n    ],\n    \"offerId\": \"OWN-abc123def456\",\n    \"roomsCount\": 1,\n    \"childrenAges\": [5],\n    \"priceSnapshot\": {\n        \"totalPrice\": {\n            \"amount\": 299.99,\n            \"currency\": \"USD\"\n        },\n        \"basePrice\": {\n            \"amount\": 250.00,\n            \"currency\": \"USD\"\n        },\n        \"taxes\": {\n            \"amount\": 30.00,\n            \"currency\": \"USD\"\n        },\n        \"fees\": {\n            \"amount\": 19.99,\n            \"currency\": \"USD\"\n        },\n        \"nights\": 3\n    },\n    \"policySnapshot\": {\n        \"cancellationPolicySummary\": \"Free cancellation until 24 hours before check-in\",\n        \"cancellationAllowed\": true,\n        \"checkInPolicy\": \"Check-in from 3:00 PM\",\n        \"checkOutPolicy\": \"Check-out until 11:00 AM\"\n    },\n    \"idempotencyKey\": \"unique-request-id-12345\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/bookings",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "bookings"]
-						},
-						"description": "Create booking with extended fields (occupancy, guests list, snapshots, idempotency)"
-					},
-					"response": []
-				},
-				{
-					"name": "3.3 Get Booking",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "bookings", "{{bookingId}}"]
-						},
-						"description": "Get booking details by ID. Use bookingId from create booking response."
-					},
-					"response": []
-				},
-				{
-					"name": "3.4 Confirm Booking",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}/confirm",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "bookings", "{{bookingId}}", "confirm"]
-						},
-						"description": "Confirm a booking. This triggers:\n1. Recheck availability\n2. Reserve inventory\n3. Status: DRAFT → RECHECKING → PENDING_CONFIRMATION → CONFIRMED\n\n**Response Codes:**\n- 200 OK: Booking confirmed\n- 409 Conflict: Booking failed (sold out, price changed)"
-					},
-					"response": []
-				},
-				{
-					"name": "3.5 Confirm Booking (with Idempotency)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"idempotencyKey\": \"confirm-request-12345\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}/confirm",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "bookings", "{{bookingId}}", "confirm"]
-						},
-						"description": "Confirm booking with idempotency key for safe retries"
-					},
-					"response": []
-				}
-			],
-			"description": "Booking phase - Create booking, get details, and confirm"
-		},
-		{
-			"name": "4. Management Phase",
-			"item": [
-				{
-					"name": "4.1 Update Hotel",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Grand Hotel Paris - Updated\",\n    \"active\": true\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/admin/hotels/hotel-001",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "admin", "hotels", "hotel-001"]
-						},
-						"description": "Update hotel information (name, active status)"
-					},
-					"response": []
-				},
-				{
-					"name": "4.2 Update Room Type",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer user-123",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Deluxe Room - Updated\",\n    \"maxGuests\": 3,\n    \"active\": true\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/admin/room-types/DELUXE",
-							"host": ["{{baseUrl}}"],
-							"path": ["v1", "admin", "room-types", "DELUXE"]
-						},
-						"description": "Update room type (name, maxGuests, active status)"
-					},
-					"response": []
-				},
-				{
-					"name": "4.3 Update Inventory Row",
+					"name": "Update Inventory Row",
 					"request": {
 						"method": "PATCH",
 						"header": [
@@ -459,12 +242,183 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["v1", "admin", "inventory", "{{inventoryRowId}}"]
 						},
-						"description": "Update individual inventory row. Use inventoryRowId from get inventory response."
+						"description": "API 8/16: Update individual inventory row. Use inventoryRowId from get inventory response."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Public - Hotel Information",
+			"item": [
+				{
+					"name": "Get Hotel by Slug",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer user-123",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/hotels/grand-hotel-paris",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "hotels", "grand-hotel-paris"]
+						},
+						"description": "API 9/16: Get hotel information by slug. Slug is auto-generated from hotel name."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Public - Offer Search",
+			"item": [
+				{
+					"name": "Search Offers",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer user-123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"checkIn\": \"2025-01-20\",\n    \"checkOut\": \"2025-01-23\",\n    \"guests\": 2,\n    \"roomsCount\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/hotels/grand-hotel-paris/offers:search",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "hotels", "grand-hotel-paris", "offers:search"]
+						},
+						"description": "API 10/16: Search available offers for a hotel. Returns list of available room types with pricing.\n\n**Save the offerId from response!**"
 					},
 					"response": []
 				},
 				{
-					"name": "4.4 Cancel Booking",
+					"name": "Recheck Offer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer user-123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"offerId\": \"OWN-abc123def456\",\n    \"checkIn\": \"2025-01-20\",\n    \"checkOut\": \"2025-01-23\",\n    \"guests\": 2,\n    \"roomsCount\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/offers:recheck",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "offers:recheck"]
+						},
+						"description": "API 11/16: Recheck offer availability before booking.\n\n**Results:**\n- OK: Offer still available\n- PRICE_CHANGED: Price changed\n- SOLD_OUT: No longer available"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Public - Booking Management",
+			"item": [
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer user-123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hotelId\": \"hotel-001\",\n    \"roomTypeId\": \"DELUXE\",\n    \"checkIn\": \"2025-01-20\",\n    \"checkOut\": \"2025-01-23\",\n    \"guestName\": \"John Doe\",\n    \"guestEmail\": \"john.doe@example.com\",\n    \"guestPhone\": \"+1234567890\",\n    \"idempotencyKey\": \"booking-{{$randomUUID}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings"]
+						},
+						"description": "API 12/16: Create a booking in DRAFT status.\n\n**Request Fields:**\n- `idempotencyKey` (optional): Unique key for idempotency. If same key is used, returns existing booking.\n  - Example: `\"idempotencyKey\": \"booking-123\"`\n  - If not provided, booking will be created normally\n\n**Response Fields:**\n- `bookingId`: UUID of the booking\n- `status`: Booking status (DRAFT)\n- `idempotencyKey`: Idempotency key (if provided in request)\n- `source`: Booking source (OWNER or SUPPLIER)\n  - **OWNER**: When supplierCode is null (direct owner inventory)\n  - **SUPPLIER**: When supplierCode is provided\n\n**Important:**\n- Save the `bookingId` from response!\n- `source` is automatically set based on whether supplierCode is provided\n- If you use the same `idempotencyKey` again, you'll get the existing booking (idempotent operation)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer user-123",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{bookingId}}"]
+						},
+						"description": "API 13/16: Get booking details by ID. Use bookingId from create booking response.\n\n**Response includes:**\n- `idempotencyKey`: Idempotency key (if provided during creation)\n- `source`: Booking source (OWNER or SUPPLIER)\n- All booking details (status, dates, guest info, price snapshot, etc.)\n\n**Status Values:**\n- DRAFT: Initial state\n- RECHECKING: Being rechecked\n- PENDING_CONFIRMATION: Waiting for confirmation\n- CONFIRMED: Successfully confirmed\n- FAILED: Booking failed\n- CANCELLED: Booking cancelled"
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer user-123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{bookingId}}/confirm",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{bookingId}}", "confirm"]
+						},
+						"description": "API 14/16: Confirm a booking.\n\n**Status Flow:**\nDRAFT → RECHECKING → PENDING_CONFIRMATION → CONFIRMED\n\n**Response Codes:**\n- 200 OK: Booking confirmed\n- 409 Conflict: Booking failed (sold out, price changed)\n\n**Response includes:**\n- `idempotencyKey`: Idempotency key (if provided during creation)\n- `source`: Booking source (OWNER or SUPPLIER)\n- `confirmationRef`: Confirmation reference number"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -479,18 +433,17 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["v1", "bookings", "{{bookingId}}", "cancel"]
 						},
-						"description": "Cancel a confirmed booking. Releases inventory reservation.\n\n**Requirements:**\n- Booking must be in CONFIRMED status"
+						"description": "API 15/16: Cancel a confirmed booking. Releases inventory reservation.\n\n**Requirements:**\n- Booking must be in CONFIRMED status\n\n**Response includes:**\n- `idempotencyKey`: Idempotency key (if provided during creation)\n- `source`: Booking source (OWNER or SUPPLIER)\n- Updated status: CANCELLED"
 					},
 					"response": []
 				}
-			],
-			"description": "Management phase - Update hotel, room types, inventory, and cancel bookings"
+			]
 		},
 		{
-			"name": "5. Internal APIs",
+			"name": "8. Internal APIs",
 			"item": [
 				{
-					"name": "5.1 Get Pricing Quote",
+					"name": "Get Pricing Quote",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -514,12 +467,11 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["v1", "internal", "pricing", "quote"]
 						},
-						"description": "Get pricing quote from pricing intelligence service (internal API)"
+						"description": "API 16/16: Get pricing quote from pricing intelligence service (internal API)"
 					},
 					"response": []
 				}
-			],
-			"description": "Internal APIs for pricing intelligence"
+			]
 		}
 	],
 	"variable": [

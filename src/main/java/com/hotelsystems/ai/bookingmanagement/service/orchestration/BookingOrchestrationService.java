@@ -104,8 +104,16 @@ public class BookingOrchestrationService {
         // Resolve supplier code from request or offer payload
         SupplierCode supplierCode = resolveSupplierCode(request);
         
+        // Determine source: if supplierCode is null → OWNER, else → SUPPLIER
+        BookingSource source = (supplierCode != null) 
+                ? BookingSource.SUPPLIER 
+                : BookingSource.OWNER;
+        
         // Use BookingMapper to create entity builder
         BookingEntity.BookingEntityBuilder entityBuilder = bookingMapper.toEntity(request, userId, supplierCode);
+        
+        // Set source explicitly (for owner bookings, default is SUPPLIER, so we need to override)
+        entityBuilder.source(source);
         
         // Set expiresAt = now + 15 minutes for drafts
         Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
@@ -121,12 +129,14 @@ public class BookingOrchestrationService {
         BookingEntity booking = entityBuilder.build();
         booking = bookingRepository.save(booking);
         
-        log.info("Booking created successfully - bookingId: {}, userId: {}, expiresAt: {}", 
-                booking.getId(), userId, expiresAt);
+        log.info("Booking created successfully - bookingId: {}, userId: {}, source: {}, expiresAt: {}", 
+                booking.getId(), userId, source, expiresAt);
         
         return CreateBookingResponse.builder()
                 .bookingId(booking.getId())
                 .status(booking.getStatus())
+                .idempotencyKey(booking.getIdempotencyKey())
+                .source(booking.getSource())
                 .build();
     }
     
@@ -567,6 +577,7 @@ public class BookingOrchestrationService {
                 .supplierRateKey(booking.getSupplierRateKey())
                 .expiresAt(booking.getExpiresAt())
                 .nextActions(nextActions)
+                .idempotencyKey(booking.getIdempotencyKey())
                 .build();
     }
     

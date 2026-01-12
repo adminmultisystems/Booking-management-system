@@ -1,5 +1,6 @@
 package com.hotelsystems.ai.bookingmanagement.dto.response;
 
+import com.hotelsystems.ai.bookingmanagement.enums.BookingSource;
 import com.hotelsystems.ai.bookingmanagement.enums.BookingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,5 +21,15 @@ public class CreateBookingResponse {
     private UUID bookingId;
     
     private BookingStatus status;
+    
+    /**
+     * Idempotency key (if provided in request)
+     */
+    private String idempotencyKey;
+    
+    /**
+     * Booking source (OWNER or SUPPLIER)
+     */
+    private BookingSource source;
 }
 
