@@ -1,7 +1,7 @@
 package com.hotelsystems.ai.bookingmanagement.controller.hotel;
 
 import com.hotelsystems.ai.bookingmanagement.dto.hotel.HotelResponse;
-import com.hotelsystems.ai.bookingmanagement.service.hotel.HotelService;
+import com.hotelsystems.ai.bookingmanagement.service.hotel.BookingHotelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class HotelController {
     
-    private final HotelService hotelService;
+    private final BookingHotelService hotelService;
     
     /**
      * Get hotel by slug

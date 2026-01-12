@@ -32,6 +32,16 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
 
+  # Actuator Configuration
+  actuator:
+    endpoints:
+      web:
+        exposure:
+          include: health,info
+    endpoint:
+      health:
+        show-details: when-authorized
+
 # Pricing Intelligence Configuration (Optional)
 # Dummy pricing is used by default for local/testing - no external API calls are made
 # Uncomment and configure only if you need real pricing API integration

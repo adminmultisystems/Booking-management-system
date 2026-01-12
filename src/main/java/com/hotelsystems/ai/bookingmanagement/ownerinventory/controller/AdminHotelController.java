@@ -3,7 +3,7 @@ package com.hotelsystems.ai.bookingmanagement.ownerinventory.controller;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelRequest;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelResponse;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelUpdateRequest;
-import com.hotelsystems.ai.bookingmanagement.ownerinventory.service.HotelService;
+import com.hotelsystems.ai.bookingmanagement.ownerinventory.service.OwnerInventoryHotelService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +11,16 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Admin controller for managing hotels.
+ * 
+ * Handles hotel creation and updates for owner inventory management.
  */
 @RestController
 @RequestMapping("/v1/admin/hotels")
-public class HotelController {
+public class AdminHotelController {
     
-    private final HotelService hotelService;
+    private final OwnerInventoryHotelService hotelService;
     
-    public HotelController(HotelService hotelService) {
+    public AdminHotelController(OwnerInventoryHotelService hotelService) {
         this.hotelService = hotelService;
     }
     

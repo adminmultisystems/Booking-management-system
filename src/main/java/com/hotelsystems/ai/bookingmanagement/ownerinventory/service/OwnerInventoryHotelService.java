@@ -11,14 +11,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service for managing hotels.
+ * Owner Inventory Hotel Service
+ * 
+ * Service for managing hotels in the owner inventory module.
+ * Handles hotel creation and updates for admin operations.
  */
 @Service
-public class HotelService {
+public class OwnerInventoryHotelService {
     
     private final HotelRepository hotelRepository;
     
-    public HotelService(HotelRepository hotelRepository) {
+    public OwnerInventoryHotelService(HotelRepository hotelRepository) {
         this.hotelRepository = hotelRepository;
     }
     

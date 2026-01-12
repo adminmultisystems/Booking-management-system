@@ -12,7 +12,7 @@ import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.OfferRecheckA
 import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.OfferSearchAdapter;
 import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.impl.OwnerOfferAdapterStub;
 import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.impl.SupplierOfferAdapterStub;
-import com.hotelsystems.ai.bookingmanagement.service.hotel.HotelService;
+import com.hotelsystems.ai.bookingmanagement.service.hotel.BookingHotelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ import java.util.List;
 @Slf4j
 public class OfferService {
     
-    private final HotelService hotelService;
+    private final BookingHotelService hotelService;
     private final OfferRoutingService offerRoutingService;
     private final SupplierOfferAdapterStub supplierOfferAdapter;
     private final OwnerOfferAdapterStub ownerOfferAdapter;

@@ -7,14 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Hotel Service
+ * Booking Hotel Service
  * 
- * Service for retrieving hotel information.
+ * Service for retrieving hotel information for booking operations.
+ * Used by the booking flow to look up hotel details by slug.
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class HotelService {
+public class BookingHotelService {
     
     private final StubHotelCatalog hotelCatalog;
     
