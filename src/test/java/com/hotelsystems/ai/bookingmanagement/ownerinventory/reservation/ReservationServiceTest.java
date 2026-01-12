@@ -152,7 +152,7 @@ class ReservationServiceTest {
     void releaseByBookingId_IsIdempotent() {
         // Given: A reservation exists
         createAllotments(hotelId, roomTypeId, checkIn, checkOut, 5, false);
-        UUID reservationId = reservationService.reserve(bookingId, hotelId, roomTypeId, checkIn, checkOut, 1);
+        reservationService.reserve(bookingId, hotelId, roomTypeId, checkIn, checkOut, 1);
         
         List<InventoryReservationEntity> reservations = reservationRepository.findByBookingId(bookingId);
         assertEquals(1, reservations.size());

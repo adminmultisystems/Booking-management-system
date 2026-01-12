@@ -1,7 +1,6 @@
 package com.hotelsystems.ai.bookingmanagement.ownerinventory.pricing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.PricingQuote;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.PricingQuoteRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

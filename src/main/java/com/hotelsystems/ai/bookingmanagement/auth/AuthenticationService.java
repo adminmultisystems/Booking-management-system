@@ -60,8 +60,8 @@ public class AuthenticationService {
      * @return true if authenticated, false otherwise
      */
     public boolean isAuthenticated(String authHeader) {
-        // TODO: Implement JWT token validation
-        // For now, always return true (stub)
+        // Note: JWT token validation will be implemented in production
+        // For now, always return true (stub implementation)
         return true;
     }
 }

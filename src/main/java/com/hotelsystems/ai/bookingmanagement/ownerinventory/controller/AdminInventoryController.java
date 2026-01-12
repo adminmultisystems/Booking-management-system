@@ -9,7 +9,6 @@ import com.hotelsystems.ai.bookingmanagement.ownerinventory.pricing.PricingIntel
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.repository.InventoryAllotmentRepository;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.repository.RoomTypeRepository;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;

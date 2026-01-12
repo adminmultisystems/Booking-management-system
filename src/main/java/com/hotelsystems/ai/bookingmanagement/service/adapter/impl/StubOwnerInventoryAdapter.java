@@ -5,7 +5,6 @@ import com.hotelsystems.ai.bookingmanagement.service.adapter.OwnerInventoryAdapt
 import com.hotelsystems.ai.bookingmanagement.service.adapter.RecheckResult;
 import com.hotelsystems.ai.bookingmanagement.service.adapter.RecheckStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
