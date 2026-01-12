@@ -32,6 +32,7 @@ class SupplierMappingAdminControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
+    @SuppressWarnings("removal") // MockBean is deprecated but still functional in Spring Boot 3.x
     private SupplierMappingService service;
 
     @Autowired

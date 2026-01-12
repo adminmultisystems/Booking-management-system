@@ -18,17 +18,21 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class AuthenticationInterceptor implements HandlerInterceptor {
     
-    private final AuthenticationService authenticationService;
+    @SuppressWarnings("unused")
+    private final AuthenticationService authenticationService; // Reserved for future JWT validation implementation
     
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String authHeader = request.getHeader("Authorization");
         
         // For now, allow requests without authentication (stub)
-        // In production, validate JWT token here
+        // In production, validate JWT token here using authenticationService
         if (authHeader == null || authHeader.isEmpty()) {
             log.debug("Request without Authorization header (stub mode - allowing)");
-            // In production, return false and set 401 Unauthorized
+            // In production: if (!authenticationService.isAuthenticated(authHeader)) { return false; }
+        } else {
+            // Validate token in production: authenticationService.getUserIdFromToken(authHeader);
+            log.debug("Authorization header present (stub mode - allowing)");
         }
         
         return true; // Allow request to proceed

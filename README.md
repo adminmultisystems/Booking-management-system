@@ -25,6 +25,8 @@ Phase 1 implements **ONLY** the following:
 - ✅ Normalized offer DTOs with realistic shapes
 - ✅ Configuration properties for suppliers
 
+
+
 **DO NOT** touch:
 - ❌ BookingController
 - ❌ BookingOrchestrationService

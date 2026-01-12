@@ -34,7 +34,7 @@ public class SupplierBookRequest {
     @JsonProperty("guestPhone")
     private String guestPhone;
 
-    // TODO: Add additional fields as supplier specifications evolve
+    // Note: Additional fields can be added as supplier specifications evolve
 
     public SupplierBookRequest() {
     }

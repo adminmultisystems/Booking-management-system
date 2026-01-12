@@ -25,7 +25,7 @@ public class SupplierRecheckRequest {
     @JsonProperty("checkOut")
     private LocalDate checkOut;
 
-    // TODO: Add additional fields as supplier specifications evolve
+    // Note: Additional fields can be added as supplier specifications evolve
 
     public SupplierRecheckRequest() {
     }

@@ -15,7 +15,7 @@ public class QuoteRequest {
     private int guests;
     private String currency;
     
-    // TODO: Add real API fields when available
+    // Note: Additional API fields can be added when available
     
     public QuoteRequest() {
     }

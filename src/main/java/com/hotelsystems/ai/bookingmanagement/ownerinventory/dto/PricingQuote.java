@@ -1,7 +1,5 @@
 package com.hotelsystems.ai.bookingmanagement.ownerinventory.dto;
 
-import java.util.List;
-
 /**
  * DTO representing a pricing quote from the pricing intelligence service.
  */
@@ -10,8 +8,7 @@ public class PricingQuote {
     private String currency;
     private long totalPriceMinor; // Price in minor units (e.g., paise for INR)
     
-    // TODO: Add real API fields when available
-    // Optional: List<NightlyRate> nightlyRates;
+    // Note: Additional API fields (e.g., List<NightlyRate> nightlyRates) can be added when available
     
     public PricingQuote() {
     }

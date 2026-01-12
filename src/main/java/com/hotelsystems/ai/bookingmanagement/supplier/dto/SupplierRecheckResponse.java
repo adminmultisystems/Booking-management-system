@@ -16,7 +16,7 @@ public class SupplierRecheckResponse {
     @JsonProperty("newTotalPriceMinor")
     private Long newTotalPriceMinor;
 
-    // TODO: Add additional fields as supplier specifications evolve
+    // Note: Additional fields can be added as supplier specifications evolve
 
     public SupplierRecheckResponse() {
     }

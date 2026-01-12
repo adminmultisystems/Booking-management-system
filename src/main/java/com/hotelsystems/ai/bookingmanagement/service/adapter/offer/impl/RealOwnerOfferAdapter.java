@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Real Owner Offer Adapter
@@ -172,11 +171,14 @@ public class RealOwnerOfferAdapter implements OfferSearchAdapter, OfferRecheckAd
                     .build();
         }
         
-        String hash = offerId.substring(4); // Remove "OWN-" prefix
+        // Extract offer identifier (remove "OWN-" prefix)
+        // Note: Currently not used for lookup, but kept for future use
+        // In production, you'd store offer metadata or use a different ID format
+        @SuppressWarnings("unused")
+        String offerIdentifier = offerId.substring(4);
         
         // Try to find the offer by checking all room types
         // This is not optimal but works for MVP
-        // In production, you'd store offer metadata or use a different ID format
         List<RoomTypeEntity> allRoomTypes = roomTypeRepository.findAll();
         
         for (RoomTypeEntity roomType : allRoomTypes) {

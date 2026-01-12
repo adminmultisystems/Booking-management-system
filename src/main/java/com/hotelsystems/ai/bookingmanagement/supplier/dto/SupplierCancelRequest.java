@@ -11,7 +11,7 @@ public class SupplierCancelRequest {
     @JsonProperty("bookingRef")
     private String bookingRef;
 
-    // TODO: Add additional fields as supplier specifications evolve
+    // Note: Additional fields can be added as supplier specifications evolve
 
     public SupplierCancelRequest() {
     }
