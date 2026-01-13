@@ -7,6 +7,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
@@ -37,6 +38,14 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedHeaders("Authorization", "Content-Type", "Idempotency-Key")
                 .allowCredentials(allowedCredentials)
                 .maxAge(3600); // Cache preflight response for 1 hour
+    }
+    
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Exclude H2 console from Spring MVC resource handling
+        // This allows the H2 console servlet to handle the requests
+        registry.addResourceHandler("/h2-console/**")
+                .resourceChain(false);
     }
     
     /**

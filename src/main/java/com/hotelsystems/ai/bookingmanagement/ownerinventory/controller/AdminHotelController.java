@@ -3,11 +3,7 @@ package com.hotelsystems.ai.bookingmanagement.ownerinventory.controller;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelRequest;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelResponse;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.dto.HotelUpdateRequest;
-<<<<<<<< HEAD:src/main/java/com/hotelsystems/ai/bookingmanagement/ownerinventory/controller/AdminHotelController.java
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.service.OwnerInventoryHotelService;
-========
-import com.hotelsystems.ai.bookingmanagement.ownerinventory.service.OwnerHotelService;
->>>>>>>> origin/sagar:src/main/java/com/hotelsystems/ai/bookingmanagement/ownerinventory/controller/OnwerHotelController.java
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,19 +16,11 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/v1/admin/hotels")
-<<<<<<<< HEAD:src/main/java/com/hotelsystems/ai/bookingmanagement/ownerinventory/controller/AdminHotelController.java
 public class AdminHotelController {
     
     private final OwnerInventoryHotelService hotelService;
     
     public AdminHotelController(OwnerInventoryHotelService hotelService) {
-========
-public class OnwerHotelController {
-    
-    private final OwnerHotelService hotelService;
-    
-    public OnwerHotelController(OwnerHotelService hotelService) {
->>>>>>>> origin/sagar:src/main/java/com/hotelsystems/ai/bookingmanagement/ownerinventory/controller/OnwerHotelController.java
         this.hotelService = hotelService;
     }
     

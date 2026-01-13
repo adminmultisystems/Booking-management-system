@@ -41,7 +41,7 @@ public class SecurityConfig {
         
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
-            .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless API
+            .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless API and H2 console
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .formLogin(form -> form.disable()) // Disable default form login to prevent default password
             .httpBasic(httpBasic -> httpBasic.disable()) // Disable default HTTP basic auth
@@ -53,7 +53,8 @@ public class SecurityConfig {
                 .anyRequest().permitAll()
             )
             .headers(headers -> headers
-                .frameOptions(frameOptions -> frameOptions.sameOrigin()) // Allow H2 console frames from same origin
+                .frameOptions(frameOptions -> frameOptions.disable()) // Disable frame options for H2 console
+                .contentTypeOptions(contentTypeOptions -> contentTypeOptions.disable()) // Allow H2 console content
             );
         
         return http.build();

@@ -60,9 +60,11 @@ public class HotelbedsStubAdapters implements SupplierOfferSearchAdapter, Suppli
             
             // Raw payload
             try {
+                // Generate deterministic rateKey based on hotelId and offer index
+                String rateKey = "HB-RATE-" + Math.abs((supplierHotelId + "-" + i).hashCode());
                 String rawPayload = String.format(
-                    "{\"supplier\":\"HOTELBEDS\",\"hotelId\":\"%s\",\"checkIn\":\"%s\",\"checkOut\":\"%s\",\"price\":%s}",
-                    supplierHotelId, checkIn, checkOut, totalPrice
+                    "{\"supplier\":\"HOTELBEDS\",\"hotelId\":\"%s\",\"checkIn\":\"%s\",\"checkOut\":\"%s\",\"price\":%s,\"rateKey\":\"%s\"}",
+                    supplierHotelId, checkIn, checkOut, totalPrice, rateKey
                 );
                 offer.setRawPayloadJson(rawPayload);
             } catch (Exception e) {

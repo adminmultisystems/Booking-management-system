@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +41,17 @@ public class SupplierMappingService {
         return entities.stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Find the first ACTIVE supplier mapping for a hotel.
+     * Used by routing services to determine if hotel should route to supplier path.
+     * 
+     * @param hotelId the hotel ID
+     * @return Optional containing the active mapping if found, empty otherwise
+     */
+    public Optional<SupplierHotelMappingEntity> findActiveMapping(String hotelId) {
+        return repository.findFirstByHotelIdAndStatus(hotelId, SupplierMappingStatus.ACTIVE);
     }
 
     /**

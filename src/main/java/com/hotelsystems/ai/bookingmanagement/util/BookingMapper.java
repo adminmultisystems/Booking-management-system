@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Booking Mapper
@@ -119,6 +120,38 @@ public class BookingMapper {
             policySnapshotJson = jsonUtil.toJson(request.getPolicySnapshot());
         }
         
+        // Parse rateKey and supplierHotelId from offerPayloadJson if present
+        String supplierRateKey = null;
+        String supplierHotelId = null;
+        if (request.getOfferPayloadJson() != null && !request.getOfferPayloadJson().trim().isEmpty()) {
+            try {
+                Map<String, Object> offerData = jsonUtil.fromJsonMap(request.getOfferPayloadJson());
+                if (offerData != null) {
+                    // Extract rateKey
+                    Object rateKeyValue = offerData.get("rateKey");
+                    if (rateKeyValue != null) {
+                        String rateKeyStr = rateKeyValue.toString();
+                        if (!rateKeyStr.trim().isEmpty()) {
+                            supplierRateKey = rateKeyStr;
+                            log.debug("Extracted rateKey from offerPayloadJson: {}", supplierRateKey);
+                        }
+                    }
+                    // Extract supplierHotelId
+                    Object supplierHotelIdValue = offerData.get("supplierHotelId");
+                    if (supplierHotelIdValue != null) {
+                        String supplierHotelIdStr = supplierHotelIdValue.toString();
+                        if (!supplierHotelIdStr.trim().isEmpty()) {
+                            supplierHotelId = supplierHotelIdStr;
+                            log.debug("Extracted supplierHotelId from offerPayloadJson: {}", supplierHotelId);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Fail silently - do not break booking creation if JSON parsing fails
+                log.debug("Failed to parse offerPayloadJson: {}", e.getMessage());
+            }
+        }
+        
         // Build entity
         return BookingEntity.builder()
                 .userId(userId)
@@ -132,6 +165,7 @@ public class BookingMapper {
                 .specialRequests(request.getSpecialRequests())
                 .offerPayloadJson(request.getOfferPayloadJson())
                 .supplierCode(supplierCode)
+                .supplierHotelId(supplierHotelId)
                 .status(BookingStatus.DRAFT)
                 // Extended fields
                 .occupancyAdults(occupancyAdults)
@@ -147,7 +181,8 @@ public class BookingMapper {
                 .children(children)
                 .childrenAgesJson(childrenAgesJson)
                 .leadGuestJson(leadGuestJson)
-                // supplierRateKey, expiresAt, nextActionsJson are not set from request
+                .supplierRateKey(supplierRateKey)
+                // expiresAt, nextActionsJson are not set from request
                 // They can be set separately if needed
                 ;
     }

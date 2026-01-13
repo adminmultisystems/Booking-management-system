@@ -1,0 +1,1953 @@
+{
+	"info": {
+		"_postman_id": "booking-management-api",
+		"name": "Booking Management API",
+		"description": "Complete API collection for Spring Boot Booking Management backend. Includes all flows: OWNER and SUPPLIER booking paths, admin setup, offer search/recheck, and debug endpoints.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. AUTH SETUP (COMMON)",
+			"item": [
+				{
+					"name": "Collection Variables",
+					"item": [],
+					"description": "Collection-level variables:\n- baseUrl = http://localhost:8080\n- authToken = Bearer user-test-123\n\nAll /v1/** requests must include Authorization header with {{authToken}}"
+				}
+			]
+		},
+		{
+			"name": "2. ADMIN / OWNER SETUP",
+			"item": [
+				{
+					"name": "2.1 Create Hotel (OWNER)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"HOTEL-001\",\n  \"name\": \"Grand Hotel\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/hotels",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "admin", "hotels"]
+						},
+						"description": "Creates a new hotel. The hotel name will be used to generate a slug (lowercase, spaces replaced with hyphens). Example: 'Grand Hotel' -> 'grand-hotel'. Save the returned hotelId as collection variable."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"HOTEL-001\",\n  \"name\": \"Grand Hotel\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/admin/hotels",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "admin", "hotels"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"id\": \"HOTEL-001\",\n  \"name\": \"Grand Hotel\",\n  \"active\": true,\n  \"createdAt\": \"2024-01-15T10:00:00Z\",\n  \"updatedAt\": \"2024-01-15T10:00:00Z\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('hotelId', response.id);",
+									"    pm.collectionVariables.set('hotelSlug', response.name.toLowerCase().replace(/\\s+/g, '-'));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "2.2 Create Room Type",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"ROOM-001\",\n  \"name\": \"Deluxe Room\",\n  \"maxGuests\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/room-types",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "admin", "hotels", "{{hotelId}}", "room-types"]
+						},
+						"description": "Creates a new room type for the specified hotel. Save the returned roomTypeId as collection variable."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"ROOM-001\",\n  \"name\": \"Deluxe Room\",\n  \"maxGuests\": 2\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/room-types",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "admin", "hotels", "{{hotelId}}", "room-types"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"id\": \"ROOM-001\",\n  \"hotelId\": \"HOTEL-001\",\n  \"name\": \"Deluxe Room\",\n  \"maxGuests\": 2,\n  \"active\": true,\n  \"createdAt\": \"2024-01-15T10:05:00Z\",\n  \"updatedAt\": \"2024-01-15T10:05:00Z\"\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('roomTypeId', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "2.3 Bulk Inventory Upsert",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"startDate\": \"2024-12-01\",\n  \"endDate\": \"2024-12-31\",\n  \"allotmentQty\": 10,\n  \"stopSell\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/inventory/bulk-upsert",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "admin", "hotels", "{{hotelId}}", "inventory", "bulk-upsert"]
+						},
+						"description": "Bulk upserts inventory allotments for a date range. Creates or updates one row per date from startDate (inclusive) to endDate (exclusive). Dates must be today or future dates."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"startDate\": \"2024-12-01\",\n  \"endDate\": \"2024-12-31\",\n  \"allotmentQty\": 10,\n  \"stopSell\": false\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/inventory/bulk-upsert",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "admin", "hotels", "{{hotelId}}", "inventory", "bulk-upsert"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"body": "Successfully upserted 30 inventory allotment(s)"
+						}
+					]
+				},
+				{
+					"name": "2.4 View Inventory",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/inventory?roomTypeId={{roomTypeId}}&start=2024-12-01&end=2024-12-31",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "admin", "hotels", "{{hotelId}}", "inventory"],
+							"query": [
+								{
+									"key": "roomTypeId",
+									"value": "{{roomTypeId}}",
+									"description": "Optional room type filter"
+								},
+								{
+									"key": "start",
+									"value": "2024-12-01",
+									"description": "Optional start date filter"
+								},
+								{
+									"key": "end",
+									"value": "2024-12-31",
+									"description": "Optional end date filter"
+								}
+							]
+						},
+						"description": "Retrieves inventory allotments for the hotel. Optional query parameters: roomTypeId, start date, end date."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/inventory?roomTypeId={{roomTypeId}}&start=2024-12-01&end=2024-12-31",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "admin", "hotels", "{{hotelId}}", "inventory"],
+									"query": [
+										{
+											"key": "roomTypeId",
+											"value": "{{roomTypeId}}"
+										},
+										{
+											"key": "start",
+											"value": "2024-12-01"
+										},
+										{
+											"key": "end",
+											"value": "2024-12-31"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "[\n  {\n    \"id\": \"uuid-here\",\n    \"hotelId\": \"HOTEL-001\",\n    \"roomTypeId\": \"ROOM-001\",\n    \"date\": \"2024-12-01\",\n    \"allotmentQty\": 10,\n    \"stopSell\": false,\n    \"currency\": \"INR\",\n    \"totalPriceMinor\": 10000,\n    \"createdAt\": \"2024-01-15T10:10:00Z\",\n    \"updatedAt\": \"2024-01-15T10:10:00Z\"\n  }\n]"
+						}
+					]
+				}
+			],
+			"description": "Admin endpoints for setting up hotel, room types, and inventory. These must be run in order before testing booking flows."
+		},
+		{
+			"name": "3. SUPPLIER MAPPING SETUP",
+			"item": [
+				{
+					"name": "3.1 Map Hotel to Hotelbeds (ACTIVE)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"supplierHotelId\": \"HB-TEST-123\",\n  \"status\": \"ACTIVE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/supplier-mapping",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "admin", "hotels", "{{hotelId}}", "supplier-mapping"]
+						},
+						"description": "Creates or updates a supplier mapping for the hotel. When status is ACTIVE, offer search will route to supplier (Hotelbeds stub). When DISABLED or no mapping exists, offer search routes to OWNER inventory."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"supplierHotelId\": \"HB-TEST-123\",\n  \"status\": \"ACTIVE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/supplier-mapping",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "admin", "hotels", "{{hotelId}}", "supplier-mapping"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"hotelId\": \"HOTEL-001\",\n  \"supplierCode\": \"HOTELBEDS\",\n  \"supplierHotelId\": \"HB-TEST-123\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2024-01-15T10:15:00Z\",\n  \"updatedAt\": \"2024-01-15T10:15:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "3.2 Get Supplier Mapping",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/supplier-mapping",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "admin", "hotels", "{{hotelId}}", "supplier-mapping"]
+						},
+						"description": "Retrieves all supplier mappings for the hotel."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/admin/hotels/{{hotelId}}/supplier-mapping",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "admin", "hotels", "{{hotelId}}", "supplier-mapping"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "[\n  {\n    \"hotelId\": \"HOTEL-001\",\n    \"supplierCode\": \"HOTELBEDS\",\n    \"supplierHotelId\": \"HB-TEST-123\",\n    \"status\": \"ACTIVE\",\n    \"createdAt\": \"2024-01-15T10:15:00Z\",\n    \"updatedAt\": \"2024-01-15T10:15:00Z\"\n  }\n]"
+						}
+					]
+				}
+			],
+			"description": "Supplier mapping endpoints. ACTIVE status routes offer search to supplier. DISABLED or no mapping routes to OWNER inventory."
+		},
+		{
+			"name": "4. PUBLIC HOTEL PAGE",
+			"item": [
+				{
+					"name": "4.1 Get Hotel by Slug",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/hotels/{{hotelSlug}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "hotels", "{{hotelSlug}}"]
+						},
+						"description": "Retrieves hotel information by slug. Slug is generated from hotel name: lowercase, spaces replaced with hyphens. Example: 'Grand Hotel' -> 'grand-hotel'. This endpoint is used in the public booking flow."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/hotels/{{hotelSlug}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "hotels", "{{hotelSlug}}"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"slug\": \"grand-hotel\",\n  \"hotelId\": \"HOTEL-001\",\n  \"name\": \"Grand Hotel\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Public hotel information endpoint. Uses slug (generated from hotel name) instead of internal hotelId."
+		},
+		{
+			"name": "5. OFFER SEARCH FLOWS",
+			"item": [
+				{
+					"name": "5.1 OWNER Offer Search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/hotels/{{hotelSlug}}/offers:search",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "hotels", "{{hotelSlug}}", "offers:search"]
+						},
+						"description": "Searches for offers. Scenario: No supplier mapping OR mapping disabled. Returns offers with source = OWNER. Save the first offerId as ownerOfferId."
+					},
+					"response": [
+						{
+							"name": "Success Response (OWNER)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/hotels/{{hotelSlug}}/offers:search",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "hotels", "{{hotelSlug}}", "offers:search"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"offers\": [\n    {\n      \"offerId\": \"OWNER-OFFER-001\",\n      \"source\": \"OWNER\",\n      \"hotelId\": \"HOTEL-001\",\n      \"roomTypeId\": \"ROOM-001\",\n      \"checkIn\": \"2024-12-15\",\n      \"checkOut\": \"2024-12-17\",\n      \"totalPrice\": {\n        \"amount\": 200.00,\n        \"currency\": \"USD\"\n      },\n      \"cancellationPolicySummary\": \"Free cancellation until 24 hours before check-in\",\n      \"payload\": null\n    }\n  ]\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.offers && response.offers.length > 0) {",
+									"        const ownerOffer = response.offers.find(o => o.source === 'OWNER');",
+									"        if (ownerOffer) {",
+									"            pm.collectionVariables.set('ownerOfferId', ownerOffer.offerId);",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "5.2 SUPPLIER Offer Search (Hotelbeds Stub)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/hotels/{{hotelSlug}}/offers:search",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "hotels", "{{hotelSlug}}", "offers:search"]
+						},
+						"description": "Searches for offers. Scenario: Supplier mapping ACTIVE. Returns offers with source = SUPPLIER. Payload includes supplierCode, supplierHotelId, rateKey (stub or placeholder). Save the first offerId as supplierOfferId."
+					},
+					"response": [
+						{
+							"name": "Success Response (SUPPLIER)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/hotels/{{hotelSlug}}/offers:search",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "hotels", "{{hotelSlug}}", "offers:search"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"offers\": [\n    {\n      \"offerId\": \"HB-OFFER-HOTEL-001-2024-12-15-0\",\n      \"source\": \"SUPPLIER\",\n      \"hotelId\": \"HOTEL-001\",\n      \"roomTypeId\": null,\n      \"checkIn\": \"2024-12-15\",\n      \"checkOut\": \"2024-12-17\",\n      \"totalPrice\": {\n        \"amount\": 250.00,\n        \"currency\": \"USD\"\n      },\n      \"cancellationPolicySummary\": \"Free cancellation until 24 hours before check-in\",\n      \"payload\": {\n        \"supplierCode\": \"HOTELBEDS\",\n        \"supplierHotelId\": \"HB-TEST-123\",\n        \"rateKey\": \"HB-RATE-123456\",\n        \"roomCode\": \"STD\",\n        \"currency\": \"USD\",\n        \"expectedTotalPriceMinor\": 25000\n      }\n    }\n  ]\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    try {",
+									"        const response = pm.response.json();",
+									"        console.log('Response:', JSON.stringify(response, null, 2));",
+									"        if (response.offers && response.offers.length > 0) {",
+									"            const supplierOffer = response.offers.find(o => o.source === 'SUPPLIER');",
+									"            console.log('Supplier Offer:', JSON.stringify(supplierOffer, null, 2));",
+									"            if (supplierOffer) {",
+									"                pm.collectionVariables.set('supplierOfferId', supplierOffer.offerId);",
+									"                console.log('Set supplierOfferId:', supplierOffer.offerId);",
+									"                ",
+									"                // Extract payload - handle both object and JsonNode formats",
+									"                let payload = supplierOffer.payload;",
+									"                if (payload) {",
+									"                    // If payload is already a string, parse it first",
+									"                    if (typeof payload === 'string') {",
+									"                        try {",
+									"                            payload = JSON.parse(payload);",
+									"                        } catch (e) {",
+									"                            console.log('Payload is already a string, using as-is');",
+									"                        }",
+									"                    }",
+									"                    ",
+									"                    // Convert to JSON string",
+									"                    const payloadStr = JSON.stringify(payload);",
+									"                    pm.collectionVariables.set('supplierOfferPayload', payloadStr);",
+									"                    console.log('Set supplierOfferPayload:', payloadStr);",
+									"                } else {",
+									"                    console.log('WARNING: No payload found in supplier offer');",
+									"                }",
+									"            } else {",
+									"                console.log('WARNING: No SUPPLIER offer found in response');",
+									"            }",
+									"        } else {",
+									"            console.log('WARNING: No offers found in response');",
+									"        }",
+									"    } catch (error) {",
+									"        console.log('Error processing response:', error.message);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			],
+			"description": "Offer search endpoints. Routing logic: If supplier mapping ACTIVE -> SUPPLIER offers. If no mapping or DISABLED -> OWNER offers."
+		},
+		{
+			"name": "6. OFFER RECHECK",
+			"item": [
+				{
+					"name": "6.1 OWNER Offer Recheck",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"offerId\": \"{{ownerOfferId}}\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/offers:recheck",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "offers:recheck"]
+						},
+						"description": "Rechecks offer availability and validity for OWNER offer. Uses offerId from search response."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"offerId\": \"{{ownerOfferId}}\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/offers:recheck",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "offers:recheck"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"result\": \"OK\",\n  \"offer\": {\n    \"offerId\": \"OWNER-OFFER-001\",\n    \"source\": \"OWNER\",\n    \"hotelId\": \"HOTEL-001\",\n    \"roomTypeId\": \"ROOM-001\",\n    \"checkIn\": \"2024-12-15\",\n    \"checkOut\": \"2024-12-17\",\n    \"totalPrice\": {\n      \"amount\": 200.00,\n      \"currency\": \"USD\"\n    }\n  },\n  \"message\": \"Offer is still available\"\n}"
+						}
+					]
+				},
+				{
+					"name": "6.2 SUPPLIER Offer Recheck",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"offerId\": \"{{supplierOfferId}}\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/offers:recheck",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "offers:recheck"]
+						},
+						"description": "Rechecks offer availability and validity for SUPPLIER offer. Uses offerId from search response. The payload.rateKey is used internally by the stub adapter."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"offerId\": \"{{supplierOfferId}}\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/offers:recheck",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "offers:recheck"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"result\": \"OK\",\n  \"offer\": {\n    \"offerId\": \"HB-OFFER-HOTEL-001-2024-12-15-0\",\n    \"source\": \"SUPPLIER\",\n    \"hotelId\": \"HOTEL-001\",\n    \"checkIn\": \"2024-12-15\",\n    \"checkOut\": \"2024-12-17\",\n    \"totalPrice\": {\n      \"amount\": 250.00,\n      \"currency\": \"USD\"\n    },\n    \"payload\": {\n      \"supplierCode\": \"HOTELBEDS\",\n      \"supplierHotelId\": \"HB-TEST-123\",\n      \"rateKey\": \"HB-RATE-123456\"\n    }\n  },\n  \"message\": \"Offer is still available\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Offer recheck endpoints. Validates offer availability and price. Returns OK, PRICE_CHANGED, or SOLD_OUT."
+		},
+		{
+			"name": "7. BOOKING FLOWS",
+			"item": [
+				{
+					"name": "7.1 OWNER Booking - Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guestName\": \"John Doe\",\n  \"guestEmail\": \"john.doe@example.com\",\n  \"guestPhone\": \"+1234567890\",\n  \"occupancy\": {\n    \"adults\": 2,\n    \"children\": 0\n  },\n  \"offerId\": \"{{ownerOfferId}}\",\n  \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings"]
+						},
+						"description": "Creates a new booking in DRAFT status for OWNER inventory. Includes occupancy (adults/children) and lead guest information. Save the returned bookingId as ownerBookingId."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guestName\": \"John Doe\",\n  \"guestEmail\": \"john.doe@example.com\",\n  \"guestPhone\": \"+1234567890\",\n  \"occupancy\": {\n    \"adults\": 2,\n    \"children\": 0\n  },\n  \"offerId\": \"{{ownerOfferId}}\",\n  \"roomsCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "bookings"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"status\": \"DRAFT\",\n  \"source\": \"OWNER\",\n  \"idempotencyKey\": null\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('ownerBookingId', response.bookingId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "7.2 OWNER Booking - Confirm",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idempotencyKey\": \"confirm-{{ownerBookingId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{ownerBookingId}}/confirm",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{ownerBookingId}}", "confirm"]
+						},
+						"description": "Confirms a DRAFT booking. Moves status to CONFIRMED. Optional idempotency key for safe retries."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"idempotencyKey\": \"confirm-{{ownerBookingId}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/{{ownerBookingId}}/confirm",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "bookings", "{{ownerBookingId}}", "confirm"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"status\": \"CONFIRMED\",\n  \"confirmationRef\": \"OWNER-CONF-12345\",\n  \"failureReason\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "7.3 OWNER Booking - Get",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{ownerBookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{ownerBookingId}}"]
+						},
+						"description": "Retrieves booking details by ID."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/{{ownerBookingId}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "bookings", "{{ownerBookingId}}"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"status\": \"CONFIRMED\",\n  \"source\": \"OWNER\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"roomTypeId\": \"ROOM-001\",\n  \"confirmationRef\": \"OWNER-CONF-12345\",\n  \"occupancy\": {\n    \"adults\": 2,\n    \"children\": 0\n  },\n  \"guestName\": \"John Doe\",\n  \"guestEmail\": \"john.doe@example.com\",\n  \"guestPhone\": \"+1234567890\",\n  \"offerId\": \"OWNER-OFFER-001\",\n  \"roomsCount\": 1\n}"
+						}
+					]
+				},
+				{
+					"name": "7.4 OWNER Booking - Cancel",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{ownerBookingId}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{ownerBookingId}}", "cancel"]
+						},
+						"description": "Cancels a booking. Moves status to CANCELLED."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/{{ownerBookingId}}/cancel",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "bookings", "{{ownerBookingId}}", "cancel"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"status\": \"CANCELLED\",\n  \"message\": \"Booking cancelled\"\n}"
+						}
+					]
+				},
+				{
+					"name": "7.5 SUPPLIER Booking - Create (Hotelbeds Stub)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Ensure offerPayloadJson is properly formatted as a JSON string",
+									"let payload = pm.collectionVariables.get('supplierOfferPayload');",
+									"console.log('Retrieved supplierOfferPayload:', payload);",
+									"",
+									"if (!payload || payload === '' || payload === 'undefined' || payload === 'null') {",
+									"    console.log('supplierOfferPayload is empty, using fallback');",
+									"    // Fallback example payload if variable is not set",
+									"    payload = JSON.stringify({",
+									"        supplierCode: 'HOTELBEDS',",
+									"        supplierHotelId: 'HB-TEST-123',",
+									"        rateKey: 'HB-RATE-123456',",
+									"        roomCode: 'STD',",
+									"        currency: 'USD',",
+									"        expectedTotalPriceMinor: 25000",
+									"    });",
+									"    pm.collectionVariables.set('supplierOfferPayload', payload);",
+									"} else {",
+									"    // Ensure it's a valid JSON string",
+									"    try {",
+									"        // Try to parse and re-stringify to ensure it's valid JSON",
+									"        const parsed = JSON.parse(payload);",
+									"        payload = JSON.stringify(parsed);",
+									"        console.log('Validated and reformatted payload:', payload);",
+									"    } catch (e) {",
+									"        console.log('Error parsing payload, using as-is:', e.message);",
+									"    }",
+									"}",
+									"",
+									"// Store as properly escaped JSON string for use in request body",
+									"pm.variables.set('_offerPayloadJson', payload);",
+									"console.log('Set _offerPayloadJson variable:', pm.variables.get('_offerPayloadJson'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"roomTypeId\": null,\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guestName\": \"Jane Smith\",\n  \"guestEmail\": \"jane.smith@example.com\",\n  \"guestPhone\": \"+1987654321\",\n  \"occupancy\": {\n    \"adults\": 2,\n    \"children\": 0\n  },\n  \"offerId\": \"{{supplierOfferId}}\",\n  \"offerPayloadJson\": \"{{_offerPayloadJson}}\",\n  \"supplierCode\": \"HOTELBEDS\",\n  \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings"]
+						},
+						"description": "Creates a new booking in DRAFT status for SUPPLIER inventory (Hotelbeds stub). Must include offerPayloadJson exactly as returned from search (contains supplierCode, supplierHotelId, rateKey). The offerPayloadJson must be a valid JSON string. Save the returned bookingId as supplierBookingId."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verify the request body was sent correctly",
+									"const requestBody = pm.request.body.raw;",
+									"console.log('Request body sent:', requestBody);",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('supplierBookingId', response.bookingId);",
+									"    console.log('Booking created successfully:', response.bookingId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"roomTypeId\": null,\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guestName\": \"Jane Smith\",\n  \"guestEmail\": \"jane.smith@example.com\",\n  \"guestPhone\": \"+1987654321\",\n  \"occupancy\": {\n    \"adults\": 2,\n    \"children\": 0\n  },\n  \"offerId\": \"{{supplierOfferId}}\",\n  \"offerPayloadJson\": \"{{supplierOfferPayload}}\",\n  \"supplierCode\": \"HOTELBEDS\",\n  \"roomsCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "bookings"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": \"660e8400-e29b-41d4-a716-446655440001\",\n  \"status\": \"DRAFT\",\n  \"source\": \"SUPPLIER\",\n  \"idempotencyKey\": null\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('supplierBookingId', response.bookingId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "7.6 SUPPLIER Booking - Confirm",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idempotencyKey\": \"confirm-{{supplierBookingId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{supplierBookingId}}/confirm",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{supplierBookingId}}", "confirm"]
+						},
+						"description": "Confirms a DRAFT SUPPLIER booking. Moves status to CONFIRMED. Returns supplierBookingRef from Hotelbeds stub (format: HB-BOOK-xxxx)."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"idempotencyKey\": \"confirm-{{supplierBookingId}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/{{supplierBookingId}}/confirm",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "bookings", "{{supplierBookingId}}", "confirm"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": \"660e8400-e29b-41d4-a716-446655440001\",\n  \"status\": \"CONFIRMED\",\n  \"confirmationRef\": \"HB-BOOK-A1B2C3D4\",\n  \"failureReason\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "7.7 SUPPLIER Booking - Get",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{supplierBookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{supplierBookingId}}"]
+						},
+						"description": "Retrieves SUPPLIER booking details by ID. Includes supplierBookingRef if confirmed."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/bookings/{{supplierBookingId}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["v1", "bookings", "{{supplierBookingId}}"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": \"660e8400-e29b-41d4-a716-446655440001\",\n  \"status\": \"CONFIRMED\",\n  \"source\": \"SUPPLIER\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"roomTypeId\": null,\n  \"confirmationRef\": \"HB-BOOK-A1B2C3D4\",\n  \"occupancy\": {\n    \"adults\": 2,\n    \"children\": 0\n  },\n  \"guestName\": \"Jane Smith\",\n  \"guestEmail\": \"jane.smith@example.com\",\n  \"guestPhone\": \"+1987654321\",\n  \"offerId\": \"HB-OFFER-HOTEL-001-2024-12-15-0\",\n  \"roomsCount\": 1\n}"
+						}
+					]
+				}
+			],
+			"description": "Booking management endpoints. Supports both OWNER and SUPPLIER booking flows."
+		},
+		{
+			"name": "8. INTERNAL / DEBUG (DEV ONLY)",
+			"item": [
+				{
+					"name": "8.1 Supplier Stub Search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Debug-Key",
+								"value": "local-debug",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"hotelId\": \"{{hotelId}}\",\n  \"supplierHotelId\": \"HB-TEST-123\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"adults\": 2,\n  \"children\": 0,\n  \"rooms\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/internal/suppliers/offers/search",
+							"host": ["{{baseUrl}}"],
+							"path": ["internal", "suppliers", "offers", "search"]
+						},
+						"description": "Direct supplier stub search endpoint. Requires X-Debug-Key header. Only available in dev profile. Tests Hotelbeds stub adapter directly."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Debug-Key",
+										"value": "local-debug"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"hotelId\": \"{{hotelId}}\",\n  \"supplierHotelId\": \"HB-TEST-123\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"adults\": 2,\n  \"children\": 0,\n  \"rooms\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/internal/suppliers/offers/search",
+									"host": ["{{baseUrl}}"],
+									"path": ["internal", "suppliers", "offers", "search"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "[\n  {\n    \"offerId\": \"HB-OFFER-HOTEL-001-2024-12-15-0\",\n    \"supplierCode\": \"HOTELBEDS\",\n    \"supplierHotelId\": \"HB-TEST-123\",\n    \"roomName\": \"Standard Room 1\",\n    \"board\": \"Breakfast Included\",\n    \"totalPrice\": 250.00,\n    \"currency\": \"USD\",\n    \"perNightBreakdown\": [\n      {\n        \"date\": \"2024-12-15\",\n        \"price\": 125.00\n      },\n      {\n        \"date\": \"2024-12-16\",\n        \"price\": 125.00\n      }\n    ],\n    \"cancellationSummary\": \"Free cancellation until 24 hours before check-in\",\n    \"taxesAndFees\": {\n      \"included\": true,\n      \"amount\": 25.00,\n      \"description\": \"Taxes and fees included\"\n    },\n    \"rawPayloadJson\": \"{\\\"supplier\\\":\\\"HOTELBEDS\\\",\\\"hotelId\\\":\\\"HB-TEST-123\\\",\\\"checkIn\\\":\\\"2024-12-15\\\",\\\"checkOut\\\":\\\"2024-12-17\\\",\\\"price\\\":250.00,\\\"rateKey\\\":\\\"HB-RATE-123456\\\"}\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "8.2 Supplier Stub Recheck",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Debug-Key",
+								"value": "local-debug",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"offerPayload\": {\n    \"supplier\": \"HOTELBEDS\",\n    \"hotelId\": \"HB-TEST-123\",\n    \"checkIn\": \"2024-12-15\",\n    \"checkOut\": \"2024-12-17\",\n    \"price\": 250.00,\n    \"rateKey\": \"HB-RATE-123456\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/internal/suppliers/offers/recheck",
+							"host": ["{{baseUrl}}"],
+							"path": ["internal", "suppliers", "offers", "recheck"]
+						},
+						"description": "Direct supplier stub recheck endpoint. Requires X-Debug-Key header. Supports force flags: forceSoldOut=true or forcePriceChange=true in offerPayload for testing edge cases."
+					},
+					"response": [
+						{
+							"name": "Success Response (OK)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Debug-Key",
+										"value": "local-debug"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"offerPayload\": {\n    \"supplier\": \"HOTELBEDS\",\n    \"hotelId\": \"HB-TEST-123\",\n    \"checkIn\": \"2024-12-15\",\n    \"checkOut\": \"2024-12-17\",\n    \"price\": 250.00,\n    \"rateKey\": \"HB-RATE-123456\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/internal/suppliers/offers/recheck",
+									"host": ["{{baseUrl}}"],
+									"path": ["internal", "suppliers", "offers", "recheck"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"status\": \"OK\",\n  \"newTotalPriceNullable\": null,\n  \"currencyNullable\": null\n}"
+						},
+						{
+							"name": "Sold Out Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Debug-Key",
+										"value": "local-debug"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"offerPayload\": {\n    \"forceSoldOut\": true\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/internal/suppliers/offers/recheck",
+									"host": ["{{baseUrl}}"],
+									"path": ["internal", "suppliers", "offers", "recheck"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"status\": \"SOLD_OUT\",\n  \"newTotalPriceNullable\": null,\n  \"currencyNullable\": null\n}"
+						},
+						{
+							"name": "Price Changed Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Debug-Key",
+										"value": "local-debug"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"offerPayload\": {\n    \"forcePriceChange\": true\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/internal/suppliers/offers/recheck",
+									"host": ["{{baseUrl}}"],
+									"path": ["internal", "suppliers", "offers", "recheck"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"status\": \"PRICE_CHANGED\",\n  \"newTotalPriceNullable\": 275.00,\n  \"currencyNullable\": \"USD\"\n}"
+						}
+					]
+				},
+				{
+					"name": "8.3 Supplier Stub Booking Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Debug-Key",
+								"value": "local-debug",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"offerPayload\": {\n    \"supplier\": \"HOTELBEDS\",\n    \"hotelId\": \"HB-TEST-123\",\n    \"checkIn\": \"2024-12-15\",\n    \"checkOut\": \"2024-12-17\",\n    \"price\": 250.00,\n    \"rateKey\": \"HB-RATE-123456\"\n  },\n  \"guestPayload\": {\n    \"name\": \"Jane Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"phone\": \"+1987654321\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/internal/suppliers/bookings/create",
+							"host": ["{{baseUrl}}"],
+							"path": ["internal", "suppliers", "bookings", "create"]
+						},
+						"description": "Direct supplier stub booking creation endpoint. Requires X-Debug-Key header. Tests Hotelbeds stub adapter directly. Returns supplierBookingRef (format: HB-BOOK-xxxx)."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Debug-Key",
+										"value": "local-debug"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"supplierCode\": \"HOTELBEDS\",\n  \"offerPayload\": {\n    \"supplier\": \"HOTELBEDS\",\n    \"hotelId\": \"HB-TEST-123\",\n    \"checkIn\": \"2024-12-15\",\n    \"checkOut\": \"2024-12-17\",\n    \"price\": 250.00,\n    \"rateKey\": \"HB-RATE-123456\"\n  },\n  \"guestPayload\": {\n    \"name\": \"Jane Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"phone\": \"+1987654321\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/internal/suppliers/bookings/create",
+									"host": ["{{baseUrl}}"],
+									"path": ["internal", "suppliers", "bookings", "create"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"supplierBookingRef\": \"HB-BOOK-A1B2C3D4\",\n  \"status\": \"CONFIRMED\",\n  \"rawPayloadJson\": \"{\\\"bookingRef\\\":\\\"HB-BOOK-A1B2C3D4\\\",\\\"status\\\":\\\"CONFIRMED\\\",\\\"offer\\\":{...},\\\"guest\\\":{...}}\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Internal debug endpoints for testing supplier stub adapters directly. Requires X-Debug-Key header and dev profile. Not available in production."
+		},
+		{
+			"name": "9. NEGATIVE / EDGE CASES",
+			"item": [
+				{
+					"name": "9.1 Create Booking with Invalid Dates",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"checkIn\": \"2024-12-17\",\n  \"checkOut\": \"2024-12-15\",\n  \"guestName\": \"Test User\",\n  \"guestEmail\": \"test@example.com\",\n  \"guestPhone\": \"+1234567890\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings"]
+						},
+						"description": "Tests validation: checkOut must be after checkIn. Expected: 400 Bad Request."
+					},
+					"response": []
+				},
+				{
+					"name": "9.2 Recheck with Unknown OfferId",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"offerId\": \"UNKNOWN-OFFER-999\",\n  \"checkIn\": \"2024-12-15\",\n  \"checkOut\": \"2024-12-17\",\n  \"guests\": 2,\n  \"roomsCount\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/offers:recheck",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "offers:recheck"]
+						},
+						"description": "Tests error handling: offerId not found. Expected: 404 Not Found or appropriate error response."
+					},
+					"response": []
+				},
+				{
+					"name": "9.3 Confirm Booking Twice (Idempotency)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idempotencyKey\": \"confirm-twice-test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{ownerBookingId}}/confirm",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{ownerBookingId}}", "confirm"]
+						},
+						"description": "Tests idempotency: confirming an already confirmed booking should be safe. Expected: 200 OK with same confirmationRef."
+					},
+					"response": []
+				},
+				{
+					"name": "9.4 Cancel Already Cancelled Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/bookings/{{ownerBookingId}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "bookings", "{{ownerBookingId}}", "cancel"]
+						},
+						"description": "Tests idempotency: cancelling an already cancelled booking should be safe. Expected: 200 OK with status CANCELLED."
+					},
+					"response": []
+				}
+			],
+			"description": "Negative test cases and edge case scenarios for validation and error handling."
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "Bearer user-test-123",
+			"type": "string"
+		},
+		{
+			"key": "hotelId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "hotelSlug",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roomTypeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ownerOfferId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "supplierOfferId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "supplierOfferPayload",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ownerBookingId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "supplierBookingId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+

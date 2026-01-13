@@ -12,24 +12,28 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop  # Creates tables on startup, drops on shutdown (for dev)
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
+
+  # Flyway Configuration (Disabled for development - Hibernate creates tables)
+  flyway:
+    enabled: false
  
   # Database Configuration (Default - H2 for local development)
   # For PostgreSQL, use profile: postgres or set SPRING_PROFILES_ACTIVE=postgres
   datasource:
-    url: jdbc:h2:mem:hotelsystems;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:file:./data/hotelsystems;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password: ""
  
   # H2 Console (Optional - for viewing data in browser)
   # Access at: http://localhost:8080/h2-console
-  # JDBC URL: jdbc:h2:mem:hotelsystems
+  # JDBC URL: jdbc:h2:file:./data/hotelsystems
   h2:
     console:
       enabled: true
@@ -43,7 +47,10 @@ logging:
     root: INFO
     com.hotelsystems.ai.bookingmanagement: INFO
     org.springframework.web: INFO
-    org.hibernate: WARN
+    org.hibernate: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.tool.schema: DEBUG  # Logs DDL statements (CREATE, ALTER, DROP)
  
 management:
   endpoints:
@@ -89,20 +96,60 @@ spring:
   config:
     activate:
       on-profile: h2
+
+  application:
+    name: Hotelsystems.ai
+
+  # H2 Database Configuration (File-based for easier console access)
+  datasource:
+    url: jdbc:h2:file:./data/hotelsystems;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  # H2 Console (Optional - for viewing data in browser)
+  # Access at: http://localhost:8080/h2-console
+  # JDBC URL: jdbc:h2:file:./data/hotelsystems
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA/Hibernate Configuration for H2
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # Creates tables on startup, drops on shutdown (for dev)
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  # Flyway Configuration (Disabled for development - Hibernate creates tables)
+  flyway:
+    enabled: false
+
+---
+# Dev Profile Configuration (uses H2 database)
+# Run with: java -jar app.jar --spring.profiles.active=dev
+spring:
+  config:
+    activate:
+      on-profile: dev
  
   application:
     name: Hotelsystems.ai
  
-  # H2 Database Configuration (In-Memory)
+  # H2 Database Configuration (File-based for easier console access)
   datasource:
-    url: jdbc:h2:mem:hotelsystems;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:file:./data/hotelsystems;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password: ""
  
   # H2 Console (Optional - for viewing data in browser)
   # Access at: http://localhost:8080/h2-console
-  # JDBC URL: jdbc:h2:mem:hotelsystems
+  # JDBC URL: jdbc:h2:file:./data/hotelsystems
   h2:
     console:
       enabled: true
@@ -111,22 +158,25 @@ spring:
   # JPA/Hibernate Configuration for H2
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop  # Creates tables on startup, drops on shutdown (for dev)
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
-  # Actuator Configuration
-  actuator:
-    endpoints:
-      web:
-        exposure:
-          include: health,info
-    endpoint:
-      health:
-        show-details: when-authorized
 
+  # Flyway Configuration (Disabled for development - Hibernate creates tables)
+  flyway:
+    enabled: false
+
+# Pricing Intelligence Configuration (Optional for local/testing)
+# Dummy pricing is used by default - no external API calls are made
+# pricing:
+#   intelligence:
+#     base-url: https://api.pricing-intelligence.example.com
+#     api-key: your-api-key-here
+#     timeout-ms: 5000
+ 
 ---
 # PostgreSQL Database Configuration for Production
 # Use this profile for production: --spring.profiles.active=postgres
@@ -154,7 +204,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-
+ 
 # Pricing Intelligence Configuration (Optional)
 # Dummy pricing is used by default for local/testing - no external API calls are made
 # Uncomment and configure only if you need real pricing API integration
@@ -163,5 +213,6 @@ spring:
 #     base-url: https://api.pricing-intelligence.example.com
 #     api-key: your-api-key-here
 #     timeout-ms: 5000
+ 
  
  

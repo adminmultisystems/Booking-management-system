@@ -10,7 +10,7 @@ import com.hotelsystems.ai.bookingmanagement.enums.OfferSource;
 import com.hotelsystems.ai.bookingmanagement.exception.BadRequestException;
 import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.OfferRecheckAdapter;
 import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.OfferSearchAdapter;
-import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.impl.SupplierOfferAdapterStub;
+import com.hotelsystems.ai.bookingmanagement.service.adapter.offer.impl.SupplierOfferAdapter;
 import com.hotelsystems.ai.bookingmanagement.service.hotel.BookingHotelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class OfferService {
     
     private final BookingHotelService hotelService;
     private final OfferRoutingService offerRoutingService;
-    private final SupplierOfferAdapterStub supplierOfferAdapter;
+    private final SupplierOfferAdapter supplierOfferAdapter;
     private final OfferSearchAdapter ownerOfferSearchAdapter; // Use interface - @Primary will select RealOwnerOfferAdapter
     private final OfferRecheckAdapter ownerOfferRecheckAdapter; // Use interface - @Primary will select RealOwnerOfferAdapter
     
