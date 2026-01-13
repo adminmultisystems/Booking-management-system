@@ -9,6 +9,7 @@ import com.hotelsystems.ai.bookingmanagement.ownerinventory.exception.DuplicateE
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.exception.NotFoundException;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.repository.HotelRepository;
 import com.hotelsystems.ai.bookingmanagement.ownerinventory.repository.RoomTypeRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +21,12 @@ public class RoomTypeService {
     
     private final RoomTypeRepository roomTypeRepository;
     private final HotelRepository hotelRepository;
+    private final EntityManager entityManager;
     
-    public RoomTypeService(RoomTypeRepository roomTypeRepository, HotelRepository hotelRepository) {
+    public RoomTypeService(RoomTypeRepository roomTypeRepository, HotelRepository hotelRepository, EntityManager entityManager) {
         this.roomTypeRepository = roomTypeRepository;
         this.hotelRepository = hotelRepository;
+        this.entityManager = entityManager;
     }
     
     /**
@@ -111,6 +114,12 @@ public class RoomTypeService {
         
         // Save updated room type
         RoomTypeEntity updatedRoomType = roomTypeRepository.save(roomType);
+        
+        // Explicitly flush to ensure changes are written to database immediately
+        roomTypeRepository.flush();
+        
+        // Refresh entity to get the latest state from database (including updated_at timestamp from @PreUpdate)
+        entityManager.refresh(updatedRoomType);
         
         // Convert to response DTO
         return toResponse(updatedRoomType);
